@@ -1,0 +1,11 @@
+# Environment / secrets
+Server/Repository/DevOpsAppRepo/.env
+
+# Common env files
+.env
+.env.*
+
+# ASP.NET Core local development overrides (often contain secrets)
+**/appsettings.Development.json
+**/appsettings.*.json
+# (keep appsettings.json tracked)

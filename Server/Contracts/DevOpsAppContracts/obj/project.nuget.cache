@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "s4XkEgI1klk=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\mathi\\ProgrammingProjects\\DevOps\\Eksamen\\Server\\Contracts\\DevOpsAppContracts\\DevOpsAppContracts.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\mathi\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\2.0.0\\microsoft.extensions.dependencyinjection.abstractions.2.0.0.nupkg.sha512",
+    "C:\\Users\\mathi\\.nuget\\packages\\microsoft.extensions.options\\2.0.0\\microsoft.extensions.options.2.0.0.nupkg.sha512",
+    "C:\\Users\\mathi\\.nuget\\packages\\microsoft.extensions.primitives\\2.0.0\\microsoft.extensions.primitives.2.0.0.nupkg.sha512",
+    "C:\\Users\\mathi\\.nuget\\packages\\sieve\\2.5.5\\sieve.2.5.5.nupkg.sha512",
+    "C:\\Users\\mathi\\.nuget\\packages\\system.componentmodel.annotations\\4.4.1\\system.componentmodel.annotations.4.4.1.nupkg.sha512"
+  ],
+  "logs": []
+}
