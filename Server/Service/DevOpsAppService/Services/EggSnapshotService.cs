@@ -3,6 +3,8 @@ using DevOpsAppRepo.Entities;
 using DevOpsAppRepo.Interfaces;
 using DevOpsAppService.Interfaces;
 using Google.Protobuf;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace DevOpsAppService.Services;
 
@@ -23,9 +25,14 @@ public class EggSnapshotService : IEggSnapshotService
         _snapshotRepository = snapshotRepository;
     }
 
-    public async Task<EggSnapshotResultDto?> FetchAndSaveAsync(string userId, CancellationToken cancellationToken = default)
+    public async Task<EggSnapshotResultDto?> FetchAndSaveAsync(
+        string userId,
+        string eiUserId,
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(userId))
+            return null;
+        if (string.IsNullOrWhiteSpace(eiUserId))
             return null;
 
         var user = await _userRepository.GetByIdAsync(userId);
@@ -40,7 +47,7 @@ public class EggSnapshotService : IEggSnapshotService
             return new EggSnapshotResultDto
             {
                 UserId = userId,
-                EiUserId = existing.EiUserId,
+                EiUserIdHash = existing.EiUserIdHash,
                 LastFetchedUtc = existing.LastFetchedUtc,
                 NextAllowedFetchUtc = existing.LastFetchedUtc.Add(MinFetchInterval),
                 WasFetched = false
@@ -49,11 +56,15 @@ public class EggSnapshotService : IEggSnapshotService
 
         // Fetch new data from Egg API
 
-        var response = await _eggApiClient.GetFirstContactAsync(userId, cancellationToken: cancellationToken);
+        var response = await _eggApiClient.GetFirstContactAsync(eiUserId, cancellationToken: cancellationToken);
         var rawJson = JsonFormatter.Default.Format(response);
-        var eiUserId = string.IsNullOrWhiteSpace(response.EiUserId)
+        var resolvedEiUserId = string.IsNullOrWhiteSpace(response.EiUserId)
             ? response.Backup?.EiUserId
             : response.EiUserId;
+        if (string.IsNullOrWhiteSpace(resolvedEiUserId))
+            resolvedEiUserId = eiUserId;
+
+        var eiUserIdHash = HashEiUserId(resolvedEiUserId);
         var boostsUsed = response.Backup?.Stats?.HasBoostsUsed == true
             ? response.Backup.Stats.BoostsUsed
             : (ulong?)null;
@@ -63,7 +74,7 @@ public class EggSnapshotService : IEggSnapshotService
             existing = new UserEggSnapshot
             {
                 UserId = userId,
-                EiUserId = eiUserId,
+                EiUserIdHash = eiUserIdHash,
                 BoostsUsed = boostsUsed,
                 LastFetchedUtc = now,
                 RawJson = rawJson
@@ -72,7 +83,7 @@ public class EggSnapshotService : IEggSnapshotService
         }
         else
         {
-            existing.EiUserId = eiUserId;
+            existing.EiUserIdHash = eiUserIdHash;
             existing.BoostsUsed = boostsUsed;
             existing.LastFetchedUtc = now;
             existing.RawJson = rawJson;
@@ -84,11 +95,21 @@ public class EggSnapshotService : IEggSnapshotService
         return new EggSnapshotResultDto
         {
             UserId = userId,
-            EiUserId = existing.EiUserId,
+            EiUserIdHash = existing.EiUserIdHash,
             LastFetchedUtc = existing.LastFetchedUtc,
             NextAllowedFetchUtc = existing.LastFetchedUtc.Add(MinFetchInterval),
             WasFetched = true
         };
+    }
+
+    private static string? HashEiUserId(string? eiUserId)
+    {
+        if (string.IsNullOrWhiteSpace(eiUserId))
+            return null;
+
+        var bytes = Encoding.UTF8.GetBytes(eiUserId);
+        var hash = SHA256.HashData(bytes);
+        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 
 }

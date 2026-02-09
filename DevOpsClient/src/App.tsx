@@ -2,14 +2,20 @@ import { useState } from 'react'
 import './App.css'
 
 function App() {
-  const [userId, setUserId] = useState('')
+  const [eiUserId, setEiUserId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<Record<string, unknown> | null>(null)
 
   const handleRefresh = async () => {
-    if (!userId.trim()) {
-      setError('User ID is required.')
+    if (!eiUserId.trim()) {
+      setError('Ei User ID is required.')
+      return
+    }
+
+    const token = localStorage.getItem('accessToken')
+    if (!token) {
+      setError('Access token is missing in localStorage (accessToken).')
       return
     }
 
@@ -18,8 +24,11 @@ function App() {
     setResult(null)
 
     try {
-      const response = await fetch(`/api/egg-snapshots/${encodeURIComponent(userId)}/refresh`, {
-        method: 'POST'
+      const response = await fetch(`/api/egg-snapshots/refresh/${encodeURIComponent(eiUserId)}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       })
 
       if (!response.ok) {
@@ -40,13 +49,13 @@ function App() {
   return (
     <div className="card">
       <h1>Egg Snapshot Refresh</h1>
-      <label htmlFor="userId">User ID</label>
+      <label htmlFor="eiUserId">Ei User ID</label>
       <input
-        id="userId"
+        id="eiUserId"
         type="text"
-        value={userId}
-        onChange={(event) => setUserId(event.target.value)}
-        placeholder="Enter user id"
+        value={eiUserId}
+        onChange={(event) => setEiUserId(event.target.value)}
+        placeholder="Enter Ei User ID"
         autoComplete="off"
       />
       <button type="button" onClick={handleRefresh} disabled={isLoading}>

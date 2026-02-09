@@ -4,5 +4,8 @@ namespace DevOpsAppService.Interfaces;
 
 public interface IEggSnapshotService
 {
-    Task<EggSnapshotResultDto?> FetchAndSaveAsync(string userId, CancellationToken cancellationToken = default);
+    Task<EggSnapshotResultDto?> FetchAndSaveAsync(
+        string userId,
+        string eiUserId,
+        CancellationToken cancellationToken = default);
 }
