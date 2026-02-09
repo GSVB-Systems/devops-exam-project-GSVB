@@ -37,7 +37,9 @@ builder.Services.AddDbContext<DevOpsAppDbContext>(options =>
     options.UseNpgsql(conn, npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserEggSnapshotRepository, UserEggSnapshotRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEggSnapshotService, EggSnapshotService>();
 builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
 builder.Services.Configure<EggApiOptions>(builder.Configuration.GetSection(EggApiOptions.SectionName));

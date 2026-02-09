@@ -1,10 +1,10 @@
-using System.Text.Json;
+using Ei;
 
 namespace DevOpsAppService.Interfaces;
 
 public interface IEggApiClient
 {
-    Task<JsonDocument> GetFirstContactAsync(
+    Task<EggIncFirstContactResponse> GetFirstContactAsync(
         string userId,
         uint? clientVersion = null,
         string? deviceId = null,

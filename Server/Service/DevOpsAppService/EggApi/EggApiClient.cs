@@ -1,4 +1,3 @@
-using System.Text.Json;
 using DevOpsAppService.Interfaces;
 using Ei;
 using Google.Protobuf;
@@ -17,7 +16,7 @@ public sealed class EggApiClient : IEggApiClient
         _httpClient = httpClient;
         _options = options.Value;
     }
-    public async Task<JsonDocument> GetFirstContactAsync(
+    public async Task<EggIncFirstContactResponse> GetFirstContactAsync(
         string userId,
         uint? clientVersion = null,
         string? deviceId = null,
@@ -50,9 +49,7 @@ public sealed class EggApiClient : IEggApiClient
         }
 
         var responseBytes = await PostProtoBase64Async("/ei/bot_first_contact", request, cancellationToken);
-        var protoResponse = EggIncFirstContactResponse.Parser.ParseFrom(responseBytes);
-        var json = JsonFormatter.Default.Format(protoResponse);
-        return JsonDocument.Parse(json);
+        return EggIncFirstContactResponse.Parser.ParseFrom(responseBytes);
     }
 
     private async Task<byte[]> PostProtoBase64Async(string path, IMessage request, CancellationToken cancellationToken)
