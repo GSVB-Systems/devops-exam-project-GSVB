@@ -3,8 +3,11 @@ using Npgsql;
 using DevOpsAppRepo;
 using DevOpsAppRepo.Interfaces;
 using DevOpsAppRepo.Repos;
+using DevOpsAppService.EggApi;
 using DevOpsAppService.Interfaces;
 using DevOpsAppService.Services;
+using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 using Sieve.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +40,16 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
+builder.Services.Configure<EggApiOptions>(builder.Configuration.GetSection(EggApiOptions.SectionName));
+builder.Services.AddHttpClient<IEggApiClient, EggApiClient>((sp, client) =>
+{
+    var options = sp.GetRequiredService<IOptions<EggApiOptions>>().Value;
+    if (string.IsNullOrWhiteSpace(options.AuxbrainBaseUrl))
+        throw new InvalidOperationException("EggApi:AuxbrainBaseUrl must be configured in appsettings.json.");
+
+    client.BaseAddress = new Uri(options.AuxbrainBaseUrl.TrimEnd('/'));
+    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-protobuf"));
+});
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument();
 
