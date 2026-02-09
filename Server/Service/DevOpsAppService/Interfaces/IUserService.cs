@@ -4,5 +4,5 @@ namespace DevOpsAppService.Interfaces;
 
 public interface IUserService : IService<UserDto, CreateUserDto, UpdateUserDto>
 {
-    
+    Task<AuthResponseDto?> LoginAsync(LoginRequestDto request);
 }

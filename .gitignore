@@ -1,3 +1,13 @@
+/.idea/
+/bin/
+/obj/
+/.env
+/appsettings.Development.json
+**/bin/
+**/obj/
+**/.idea/
+**/.env
+**/appsettings.Development.json
 # Build folders
 **/bin/
 **/obj/

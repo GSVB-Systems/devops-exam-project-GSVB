@@ -1,5 +1,6 @@
 ﻿using DevOpsAppContracts.Models;
 using DevOpsAppRepo.Interfaces;
+using DevOpsAppService.Auth;
 using DevOpsAppService.Interfaces;
 using DevOpsAppService.Mappers;
 using Microsoft.EntityFrameworkCore;
@@ -13,12 +14,14 @@ public class UserService : IUserService
     private readonly IUserRepository _userRepository;
     private readonly ISieveProcessor _sieve;
     private readonly PasswordService _passwordService;
+    private readonly JwtTokenService _jwtTokenService;
 
-    public UserService(IUserRepository userRepository, ISieveProcessor sieve, PasswordService passwordService)
+    public UserService(IUserRepository userRepository, ISieveProcessor sieve, PasswordService passwordService, JwtTokenService jwtTokenService)
     {
         _userRepository = userRepository;
         _sieve = sieve;
         _passwordService = passwordService;
+        _jwtTokenService = jwtTokenService;
     }
 
     public async Task<UserDto?> GetByIdAsync(string id)
@@ -104,5 +107,29 @@ public class UserService : IUserService
         await _userRepository.DeleteAsync(existing);
         await _userRepository.SaveChangesAsync();
         return true;
+    }
+
+    public async Task<AuthResponseDto?> LoginAsync(LoginRequestDto request)
+    {
+        if (request is null) throw new ArgumentNullException(nameof(request));
+        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+            return null;
+
+        var user = await _userRepository.GetByEmailAsync(request.Email);
+        if (user is null)
+            return null;
+
+        var valid = _passwordService.VerifyPassword(request.Password, user.HashedPassword);
+        if (!valid)
+            return null;
+
+        var (token, expiresAtUtc) = _jwtTokenService.CreateToken(user);
+
+        return new AuthResponseDto
+        {
+            AccessToken = token,
+            TokenType = "Bearer",
+            ExpiresInSeconds = (int)(expiresAtUtc - DateTime.UtcNow).TotalSeconds
+        };
     }
 }

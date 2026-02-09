@@ -1,15 +1,17 @@
-# [...]
+# EggBoard
 
 > [!NOTE]
 > Provide a project title in the heading above. Just below this note write a short description of the application you plan to build.
 
-[...]
+Leaderboard and data management application for Egg, Inc. With complementing open user webpage.
 
 ## Tech-stack
 
 > [!NOTE]
 > Write a short description of your tech-stack here in terms of programming language(s) and database engine(s).
 
+Typescript + React
+C Sharp
 [...]
 
 ## Architecture
@@ -17,6 +19,11 @@
 > [!NOTE]
 > Write a short explanation of your planned architecture here.
 
+Frontend with user statistics and more. (Login with EID)
+
+Backend with data parsing, leaderboard construction and a custom cloudflare worker for interactions with the Egg, Inc. API
+
+Database storing user data pseudonymously
 [...]
 
 ## Feature plan
