@@ -1,5 +1,6 @@
 ﻿using DevOpsAppApi.Extensions;
 using DevOpsAppRepo;
+using DevOpsAppService.Interfaces;
 using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +26,7 @@ public class Startup
         services.AddApiServices(configuration, addDefaultDbContext: false, configureOverrides =>
         {
             configureOverrides.RemoveAll(typeof(DevOpsAppDbContext));
+            configureOverrides.RemoveAll(typeof(IEggApiClient));
 
             configureOverrides.AddScoped<DevOpsAppDbContext>(_ =>
             {
@@ -39,6 +41,9 @@ public class Startup
                 ctx.Database.EnsureCreated();
                 return ctx;
             });
+
+            configureOverrides.AddSingleton<FakeEggApiClient>();
+            configureOverrides.AddSingleton<IEggApiClient>(sp => sp.GetRequiredService<FakeEggApiClient>());
         });
     }
 }
