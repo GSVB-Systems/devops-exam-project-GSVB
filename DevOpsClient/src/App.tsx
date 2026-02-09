@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import Login from './components/Login'
 
 function App() {
   const [eiUserId, setEiUserId] = useState('')
@@ -65,6 +66,7 @@ function App() {
       {result ? (
         <pre className="result">{JSON.stringify(result, null, 2)}</pre>
       ) : null}
+      <Login />
     </div>
   )
 }
