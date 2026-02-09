@@ -8,6 +8,7 @@ namespace DevOpsAppService.EggApi;
 
 public sealed class EggApiClient : IEggApiClient
 {
+    private const string DefaultDeviceId = "red-blue";
     private readonly HttpClient _httpClient;
     private readonly EggApiOptions _options;
 
@@ -28,26 +29,52 @@ public sealed class EggApiClient : IEggApiClient
         var request = new EggIncFirstContactRequest
         {
             EiUserId = userId,
-            UserId = userId
+            UserId = userId,
+            Rinfo = new BasicRequestInfo
+            {
+                EiUserId = userId,
+                ClientVersion = 999,
+                Platform = "IOS",
+                Build = "111331",
+                Version = "1.35.4"
+            }
         };
 
-        if (!string.IsNullOrWhiteSpace(deviceId))
-            request.DeviceId = deviceId;
+        request.DeviceId = string.IsNullOrWhiteSpace(deviceId) ? DefaultDeviceId : deviceId;
 
         var resolvedClientVersion = clientVersion ?? _options.ClientVersion;
         if (resolvedClientVersion.HasValue)
+        {
             request.ClientVersion = resolvedClientVersion.Value;
+            request.Rinfo.ClientVersion = resolvedClientVersion.Value;
+        }
 
-        var payload = request.ToByteArray();
-        using var content = new ByteArrayContent(payload);
-        content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/x-protobuf");
-
-        using var response = await _httpClient.PostAsync("/ei/bot_first_contact", content, cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        await using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        var protoResponse = EggIncFirstContactResponse.Parser.ParseFrom(responseStream);
+        var responseBytes = await PostProtoBase64Async("/ei/bot_first_contact", request, cancellationToken);
+        var protoResponse = EggIncFirstContactResponse.Parser.ParseFrom(responseBytes);
         var json = JsonFormatter.Default.Format(protoResponse);
         return JsonDocument.Parse(json);
+    }
+
+    private async Task<byte[]> PostProtoBase64Async(string path, IMessage request, CancellationToken cancellationToken)
+    {
+        var payload = request.ToByteArray();
+        var base64Payload = Convert.ToBase64String(payload);
+        using var content = new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["data"] = base64Payload
+        });
+
+        using var response = await _httpClient.PostAsync(path, content, cancellationToken);
+        response.EnsureSuccessStatusCode();
+
+        var responseText = await response.Content.ReadAsStringAsync(cancellationToken);
+        try
+        {
+            return Convert.FromBase64String(responseText.Trim());
+        }
+        catch (FormatException ex)
+        {
+            throw new InvalidOperationException($"Body: {responseText}", ex);
+        }
     }
 }
