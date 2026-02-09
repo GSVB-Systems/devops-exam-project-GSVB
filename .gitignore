@@ -1,3 +1,24 @@
+# Build folders
+**/bin/
+**/obj/
+bin/
+obj/
+
+# IDE folders
+**/.idea/
+.idea/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# JetBrains Rider
+*.sln.iml
+.idea/
+
 # Environment / secrets
 Server/Repository/DevOpsAppRepo/.env
 
