@@ -3,6 +3,7 @@ using System;
 using DevOpsAppRepo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DevOpsAppRepo.Migrations
 {
     [DbContext(typeof(DevOpsAppDbContext))]
-    partial class DevOpsAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260209133034_JsonSnapshot")]
+    partial class JsonSnapshot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace DevOpsAppRepo.Migrations
                     b.Property<decimal?>("BoostsUsed")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<string>("EiUserIdHash")
+                    b.Property<string>("EiUserId")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastFetchedUtc")

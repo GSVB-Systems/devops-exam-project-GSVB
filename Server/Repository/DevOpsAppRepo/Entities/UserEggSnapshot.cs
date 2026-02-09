@@ -5,7 +5,7 @@ namespace DevOpsAppRepo.Entities;
 public class UserEggSnapshot
 {
     public string UserId { get; set; } = string.Empty;
-    public string? EiUserId { get; set; }
+    public string? EiUserIdHash { get; set; }
     public ulong? BoostsUsed { get; set; }
     public DateTime LastFetchedUtc { get; set; }
     public string RawJson { get; set; } = string.Empty;
