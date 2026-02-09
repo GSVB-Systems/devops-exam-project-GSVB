@@ -10,6 +10,9 @@ using DevOpsAppService.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DevOpsAppService.EggApi;
+using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,11 +41,24 @@ builder.Services.AddDbContext<DevOpsAppDbContext>(options =>
     options.UseNpgsql(conn, npgsqlOptions => npgsqlOptions.EnableRetryOnFailure()));
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<PasswordService>();
-builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocument();
+builder.Services.AddScoped<IUserEggSnapshotRepository, UserEggSnapshotRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEggSnapshotService, EggSnapshotService>();
+builder.Services.AddScoped<PasswordService>();
+builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
+builder.Services.Configure<EggApiOptions>(builder.Configuration.GetSection(EggApiOptions.SectionName));
+builder.Services.AddHttpClient<IEggApiClient, EggApiClient>((sp, client) =>
+{
+    var options = sp.GetRequiredService<IOptions<EggApiOptions>>().Value;
+    if (string.IsNullOrWhiteSpace(options.AuxbrainBaseUrl))
+        throw new InvalidOperationException("EggApi:AuxbrainBaseUrl must be configured in appsettings.json.");
+
+    client.BaseAddress = new Uri(options.AuxbrainBaseUrl.TrimEnd('/'));
+    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-protobuf"));
+});
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtOptions = jwtSection.Get<JwtOptions>() ?? throw new InvalidOperationException("Missing Jwt configuration.");
@@ -52,6 +68,8 @@ if (string.IsNullOrWhiteSpace(jwtOptions.Secret))
 var secretByteLength = Encoding.UTF8.GetByteCount(jwtOptions.Secret);
 if (secretByteLength < 32)
     throw new InvalidOperationException("Jwt:Secret must be at least 32 bytes (256 bits).");
+
+
 
 builder.Services.AddSingleton(jwtOptions);
 builder.Services.AddSingleton<JwtTokenService>();
@@ -72,6 +90,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddControllers();
+builder.Services.AddOpenApiDocument();
 
 var app = builder.Build();
 
