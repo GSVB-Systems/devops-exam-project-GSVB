@@ -3,6 +3,7 @@ using DevOpsAppService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace DevOpsAppApi.Controllers;
 
@@ -21,7 +22,7 @@ public class EggSnapshotController : ControllerBase
     [HttpPost("refresh/{eiUserId}")]
     public async Task<ActionResult<EggSnapshotResultDto>> Refresh(string eiUserId, CancellationToken cancellationToken)
     {
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrWhiteSpace(userId))
             return Unauthorized();
 
