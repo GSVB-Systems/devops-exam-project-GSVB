@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Repository\DevOpsAppRepo\DevOpsAppRepo.csproj" />
     <ProjectReference Include="..\..\Service\DevOpsAppService\DevOpsAppService.csproj" />
     <ProjectReference Include="..\..\Contracts\DevOpsAppContracts\DevOpsAppContracts.csproj" />
   </ItemGroup>
@@ -8,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
     <PackageReference Include="NSwag.Core" Version="14.6.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
   </ItemGroup>
 
   <PropertyGroup>

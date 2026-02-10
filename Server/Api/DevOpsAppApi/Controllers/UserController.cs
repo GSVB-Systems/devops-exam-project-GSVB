@@ -1,5 +1,6 @@
 ﻿using DevOpsAppContracts.Models;
 using DevOpsAppService.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 
@@ -16,6 +17,7 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
+    [Authorize]
     [HttpGet("getAllUsers")]
     public async Task<ActionResult<PagedResult<UserDto>>> GetAll([FromQuery] SieveModel? parameters)
     {
@@ -23,6 +25,7 @@ public class UserController : ControllerBase
         return Ok(users);
     }
 
+    [Authorize]
     [HttpGet("getUserById/{id}")]
     public async Task<ActionResult<UserDto>> GetById(string id)
     {
@@ -30,6 +33,7 @@ public class UserController : ControllerBase
         return user is null ? NotFound() : Ok(user);
     }
 
+    [Authorize]
     [HttpPost("createUser")]
     public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto dto)
     {
@@ -37,6 +41,7 @@ public class UserController : ControllerBase
         return Ok(created);
     }
 
+    [Authorize]
     [HttpPut("updateUser/{id}")]
     public async Task<ActionResult<UserDto>> Update(string id, [FromBody] UpdateUserDto dto)
     {
@@ -44,10 +49,19 @@ public class UserController : ControllerBase
         return updated is null ? NotFound() : Ok(updated);
     }
 
+    [Authorize]
     [HttpDelete("deleteUser/{id}")]
     public async Task<IActionResult> Delete(string id)
     {
         var deleted = await _userService.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();
+    }
+
+    [AllowAnonymous]
+    [HttpPost("login")]
+    public async Task<ActionResult<AuthResponseDto>> Login([FromBody] LoginRequestDto dto)
+    {
+        var result = await _userService.LoginAsync(dto);
+        return result is null ? Unauthorized() : Ok(result);
     }
 }

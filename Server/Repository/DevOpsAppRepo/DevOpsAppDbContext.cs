@@ -14,6 +14,7 @@ public class DevOpsAppDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<UserEggSnapshot> UserEggSnapshots { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -60,6 +61,15 @@ public class DevOpsAppDbContext : DbContext
             eb.HasKey(u => u.UserId);
             eb.Property(u => u.UserId).IsRequired();
             eb.Property(u => u.Email).IsRequired();
+        });
+
+        modelBuilder.Entity<UserEggSnapshot>(eb =>
+        {
+            eb.HasKey(s => s.UserId);
+            eb.Property(s => s.UserId).IsRequired();
+            eb.Property(s => s.LastFetchedUtc).IsRequired();
+            eb.Property(s => s.RawJson).HasColumnType("jsonb").IsRequired();
+            eb.HasOne<User>().WithOne().HasForeignKey<UserEggSnapshot>(s => s.UserId);
         });
 
         base.OnModelCreating(modelBuilder);
