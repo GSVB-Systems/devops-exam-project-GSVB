@@ -88,8 +88,7 @@ public static class EggSnapshotFormulas
         if (!soulEggs.HasValue
             || !eggsOfProphecy.HasValue
             || !truthEggs.HasValue
-            || !soulFoodLevels.HasValue
-            || !prophecyBonusLevels.HasValue)
+            || !soulFoodLevels.HasValue)
         {
             return null;
         }
@@ -98,8 +97,15 @@ public static class EggSnapshotFormulas
         var pe = eggsOfProphecy.Value;
         var te = truthEggs.Value;
 
+        if (pe > 0 && !prophecyBonusLevels.HasValue)
+        {
+            return null;
+        }
+
         var baseMult = 10D + soulFoodLevels.Value;
-        var prophecyMult = Math.Pow(1.05D + 0.01D * prophecyBonusLevels.Value, pe);
+        var prophecyMult = pe <= 0
+            ? 1D
+            : Math.Pow(1.05D + 0.01D * prophecyBonusLevels.Value, pe);
         var truthMult = Math.Pow(1.01D, te);
 
         return se * baseMult * prophecyMult * truthMult;

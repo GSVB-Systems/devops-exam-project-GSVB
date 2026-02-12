@@ -89,6 +89,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEggAccountService, EggAccountService>();
         services.AddScoped<IEggSnapshotService, EggSnapshotService>();
+        services.AddScoped<ILeaderboardService, LeaderboardService>();
         services.AddScoped<PasswordService>();
         services.AddScoped<ISieveProcessor, SieveProcessor>();
         services.Configure<EggApiOptions>(configuration.GetSection(EggApiOptions.SectionName));

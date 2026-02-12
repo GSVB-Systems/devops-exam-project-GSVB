@@ -45,12 +45,12 @@ public class EggSnapshotService : IEggSnapshotService
         {
             var recalculated = EggSnapshotFormulas.Calculate(
                 existing.SoulEggs,
-                existing.EggsOfProphecy,
+                existing.EggsOfProphecy ?? 0UL,
                 existing.BoostsUsed,
                 existing.CraftingXp,
                 existing.GoldenEggsBalance,
                 existing.GoldenEggsSpent,
-                existing.TruthEggs,
+                existing.TruthEggs ?? 0UL,
                 null,
                 null);
             var mer = recalculated.Mer ?? existing.Mer;
@@ -118,6 +118,8 @@ public class EggSnapshotService : IEggSnapshotService
         {
             truthEggs = (ulong)virtue.EovEarned.Sum(value => (long)value);
         }
+        eggsOfProphecy ??= 0UL;
+        truthEggs ??= 0UL;
         var goldenEggsEarned = game?.HasGoldenEggsEarned == true
             ? game.GoldenEggsEarned
             : (ulong?)null;

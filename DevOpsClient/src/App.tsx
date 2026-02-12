@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import AccountSettingsPage from './pages/AccountSettingsPage.tsx'
+import LeaderboardsPage from './pages/LeaderboardsPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import MainPage from './pages/MainPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
@@ -24,6 +25,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AccountSettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/leaderboards"
+            element={
+              <ProtectedRoute>
+                <LeaderboardsPage />
               </ProtectedRoute>
             }
           />

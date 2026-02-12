@@ -181,9 +181,14 @@ const MainPage = () => {
             <p className="eyebrow">Account Switcher</p>
             <h3 className="panel-title">Egg Accounts</h3>
           </div>
-          <Link to="/settings" className="btn btn-xs btn-outline">
-            Settings
-          </Link>
+          <div className="shell-actions">
+            <Link to="/leaderboards" className="btn btn-xs btn-outline">
+              Leaderboards
+            </Link>
+            <Link to="/settings" className="btn btn-xs btn-outline">
+              Settings
+            </Link>
+          </div>
         </div>
 
         <div className="mt-4 lg:hidden">
