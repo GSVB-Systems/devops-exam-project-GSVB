@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { userApi, type EggAccount, type EggAccountRefresh, type UserProfile } from '../api/userApi'
 
 const MainPage = () => {
+  const selectedAccountStorageKey = 'selectedEiUserId'
+  const snapshotStorageKey = 'eggSnapshotsByUserId'
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [eggAccounts, setEggAccounts] = useState<EggAccount[]>([])
   const [selectedEiUserId, setSelectedEiUserId] = useState<string | null>(null)
@@ -24,7 +26,11 @@ const MainPage = () => {
         setProfile(user)
         setEggAccounts(accounts)
         const mainAccount = accounts.find((account) => account.status === 'Main')
-        const defaultEiUserId = mainAccount?.eiUserId ?? accounts[0]?.eiUserId ?? null
+        const storedEiUserId = localStorage.getItem(selectedAccountStorageKey)
+        const storedAccount = storedEiUserId
+          ? accounts.find((account) => account.eiUserId === storedEiUserId)
+          : null
+        const defaultEiUserId = storedAccount?.eiUserId ?? mainAccount?.eiUserId ?? accounts[0]?.eiUserId ?? null
         setSelectedEiUserId(defaultEiUserId)
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load egg accounts.'
@@ -35,9 +41,37 @@ const MainPage = () => {
     void loadAccounts()
   }, [])
 
+  const loadSnapshotCache = () => {
+    const raw = localStorage.getItem(snapshotStorageKey)
+    if (!raw) return {}
+    try {
+      const parsed = JSON.parse(raw)
+      return parsed && typeof parsed === 'object' ? parsed : {}
+    } catch {
+      return {}
+    }
+  }
+
+  const saveSnapshotCache = (cache: Record<string, EggAccountRefresh>) => {
+    localStorage.setItem(snapshotStorageKey, JSON.stringify(cache))
+  }
+
   useEffect(() => {
-    setSnapshot(null)
+    if (!selectedEiUserId) {
+      setSnapshot(null)
+      setRefreshError(null)
+      return
+    }
+
+    const cachedSnapshots = loadSnapshotCache()
+    const cachedSnapshot = cachedSnapshots[selectedEiUserId] ?? null
+    setSnapshot(cachedSnapshot)
     setRefreshError(null)
+  }, [selectedEiUserId])
+
+  useEffect(() => {
+    if (!selectedEiUserId) return
+    localStorage.setItem(selectedAccountStorageKey, selectedEiUserId)
   }, [selectedEiUserId])
 
   const selectedAccount = useMemo(
@@ -50,12 +84,55 @@ const MainPage = () => {
     return value.toLocaleString(undefined, { maximumFractionDigits: digits })
   }
 
-  const formatSoulEggs = (value: number | null | undefined) => {
+  const magnitudeUnits = [
+    { threshold: 1e3, suffix: 'K' },
+    { threshold: 1e6, suffix: 'M' },
+    { threshold: 1e9, suffix: 'B' },
+    { threshold: 1e12, suffix: 'T' },
+    { threshold: 1e15, suffix: 'q' },
+    { threshold: 1e18, suffix: 'Q' },
+    { threshold: 1e21, suffix: 's' },
+    { threshold: 1e24, suffix: 'S' },
+    { threshold: 1e27, suffix: 'o' },
+    { threshold: 1e30, suffix: 'N' },
+    { threshold: 1e33, suffix: 'd' },
+    { threshold: 1e36, suffix: 'U' },
+    { threshold: 1e39, suffix: 'D' },
+    { threshold: 1e42, suffix: 'Td' },
+    { threshold: 1e45, suffix: 'qd' },
+    { threshold: 1e48, suffix: 'Qd' },
+    { threshold: 1e51, suffix: 'sd' },
+    { threshold: 1e54, suffix: 'Sd' },
+    { threshold: 1e57, suffix: 'Od' },
+    { threshold: 1e60, suffix: 'Nd' },
+    { threshold: 1e63, suffix: 'V' }
+  ]
+
+  const formatMagnitude = (
+    value: number | null | undefined,
+    digits = 3,
+    smallDigits = digits
+  ) => {
     if (value === null || value === undefined) return '--'
-    if (value >= 1e18) {
-      return `${(value / 1e18).toFixed(2)}Q`
+
+    const absValue = Math.abs(value)
+    if (absValue < 1e3) {
+      return formatNumber(value, smallDigits)
     }
-    return value.toLocaleString()
+
+    const unitIndex = Math.min(
+      magnitudeUnits.length - 1,
+      Math.max(0, Math.floor(Math.log10(absValue) / 3) - 1)
+    )
+    const unit = magnitudeUnits[unitIndex]
+    return `${(value / unit.threshold).toFixed(digits)}${unit.suffix}`
+  }
+
+  const formatSoulEggs = (value: number | null | undefined) => formatMagnitude(value, 3, 0)
+
+  const formatEb = (value: number | null | undefined) => {
+    const formatted = formatMagnitude(value, 3, 2)
+    return formatted === '--' ? formatted : `${formatted}%`
   }
 
   const formatDate = (value: string | null | undefined) => {
@@ -82,6 +159,9 @@ const MainPage = () => {
     try {
       const data = await userApi.refreshEggAccount(token, selectedEiUserId)
       setSnapshot(data)
+      const cachedSnapshots = loadSnapshotCache()
+      cachedSnapshots[selectedEiUserId] = data
+      saveSnapshotCache(cachedSnapshots)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to refresh snapshot.'
       setRefreshError(message)
@@ -192,7 +272,7 @@ const MainPage = () => {
           </div>
           <div className="stat-tile">
             <p className="stat-label">EB%</p>
-            <p className="stat-value">{formatNumber(snapshot?.eb, 2)}</p>
+            <p className="stat-value">{formatEb(snapshot?.eb)}</p>
           </div>
         </div>
 
