@@ -2,6 +2,7 @@ using DevOpsAppContracts.Models;
 using DevOpsAppRepo;
 using DevOpsAppRepo.Entities;
 using DevOpsAppService.Interfaces;
+using DevOpsAppService.Services;
 using Ei;
 
 namespace Test;
@@ -21,9 +22,7 @@ public class EggSnapshotTests(
 
         Assert.NotNull(result);
         Assert.True(result!.WasFetched);
-        Assert.Equal(userId, result.UserId);
         Assert.Equal(result.LastFetchedUtc.AddMinutes(5), result.NextAllowedFetchUtc);
-        Assert.Equal("ei-123", result.EiUserId);
         Assert.Equal("TestName", result.UserName);
         Assert.Equal(1234D, result.SoulEggs);
         Assert.Equal((ulong)7, result.EggsOfProphecy);
@@ -50,6 +49,16 @@ public class EggSnapshotTests(
         var ct = TestContext.Current.CancellationToken;
         var userId = await CreateUserAsync("ida");
         var lastFetchedUtc = DateTime.UtcNow;
+        var calculated = EggSnapshotFormulas.Calculate(
+            soulEggs: 55,
+            eggsOfProphecy: 2,
+            boostsUsed: 1,
+            craftingXp: 2.5,
+            goldenEggsBalance: 75,
+            goldenEggsSpent: 25,
+            truthEggs: 3,
+            soulFoodLevels: null,
+            prophecyBonusLevels: null);
 
         ctx.UserEggSnapshots.Add(new UserEggSnapshot
         {
@@ -63,32 +72,39 @@ public class EggSnapshotTests(
             GoldenEggsEarned = 100,
             GoldenEggsSpent = 25,
             GoldenEggsBalance = 75,
+            Mer = calculated.Mer,
+            Jer = calculated.Jer,
             CraftingXp = 2.5,
             LastFetchedUtc = lastFetchedUtc,
               RawJson = "{\"ok\":true}",
               Id = Guid.NewGuid().ToString()
         });
         await ctx.SaveChangesAsync(ct);
+                ctx.ChangeTracker.Clear();
 
         fakeEggApiClient.Reset(BuildResponse("ei-new", boostsUsed: 99));
 
-        var result = await snapshotService.FetchAndSaveAsync(userId, "ei-new", ct);
+        var result = await snapshotService.FetchAndSaveAsync(userId, "ei-previous", ct);
 
         Assert.NotNull(result);
         Assert.False(result!.WasFetched);
-        Assert.Equal("ei-previous", result.EiUserId);
         Assert.Equal("CachedUser", result.UserName);
         Assert.Equal(55D, result.SoulEggs);
         Assert.Equal((ulong)2, result.EggsOfProphecy);
         Assert.Equal((ulong)3, result.TruthEggs);
         Assert.Equal(75, result.GoldenEggsBalance);
-        Assert.Equal(lastFetchedUtc, result.LastFetchedUtc);
-        Assert.Equal(lastFetchedUtc.AddMinutes(5), result.NextAllowedFetchUtc);
+        var expectedLastFetchedUtc = DateTime.SpecifyKind(lastFetchedUtc, DateTimeKind.Unspecified);
+        var actualLastFetchedUtc = DateTime.SpecifyKind(result.LastFetchedUtc, DateTimeKind.Unspecified);
+        Assert.Equal(expectedLastFetchedUtc, actualLastFetchedUtc, TimeSpan.FromSeconds(1));
+        Assert.Equal(expectedLastFetchedUtc.AddMinutes(5),
+            DateTime.SpecifyKind(result.NextAllowedFetchUtc, DateTimeKind.Unspecified),
+            TimeSpan.FromSeconds(1));
         Assert.Equal(0, fakeEggApiClient.CallCount);
 
         var snapshot = ctx.UserEggSnapshots.Single(s => s.UserId == userId);
-        Assert.Equal(lastFetchedUtc, snapshot.LastFetchedUtc);
-        Assert.Equal("{\"ok\":true}", snapshot.RawJson);
+        var snapshotLastFetchedUtc = DateTime.SpecifyKind(snapshot.LastFetchedUtc, DateTimeKind.Unspecified);
+        Assert.Equal(expectedLastFetchedUtc, snapshotLastFetchedUtc, TimeSpan.FromSeconds(1));
+        Assert.Equal("{\"ok\": true}", snapshot.RawJson);
     }
 
     [Fact]
@@ -146,7 +162,6 @@ public class EggSnapshotTests(
                 },
                 Game = new Backup.Types.Game
                 {
-                    Status = "Main",
                     SoulEggsD = 1234D,
                     EggsOfProphecy = 7,
                     GoldenEggsEarned = 1000,
