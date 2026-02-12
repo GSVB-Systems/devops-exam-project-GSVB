@@ -58,7 +58,7 @@ public class UserController : ControllerBase
         return user is null ? NotFound() : Ok(user);
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpPost("createUser")]
     public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto dto)
     {

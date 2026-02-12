@@ -21,6 +21,13 @@ export type UserProfile = {
   email: string
 }
 
+export type RegisterRequest = {
+  username: string
+  discordUsername?: string | null
+  email: string
+  password: string
+}
+
 export type UpdateUserRequest = {
   username?: string
   discordUsername?: string | null
@@ -34,6 +41,20 @@ export type EggAccount = {
   status: 'Main' | 'Alt'
   userName?: string | null
   lastFetchedUtc?: string | null
+}
+
+export type EggAccountRefresh = {
+  userName?: string | null
+  soulEggs?: number | null
+  eggsOfProphecy?: number | null
+  truthEggs?: number | null
+  goldenEggsBalance?: number | null
+  mer?: number | null
+  jer?: number | null
+  eb?: number | null
+  lastFetchedUtc: string
+  nextAllowedFetchUtc: string
+  wasFetched: boolean
 }
 
 export type CreateEggAccountRequest = {
@@ -95,6 +116,19 @@ const updateCurrentUser = async (token: string, request: UpdateUserRequest): Pro
   return (await response.json()) as UserProfile
 }
 
+const register = async (request: RegisterRequest): Promise<UserProfile> => {
+  const response = await fetch('/api/User/createUser', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(request)
+  })
+
+  await ensureOk(response)
+  return (await response.json()) as UserProfile
+}
+
 const getEggAccounts = async (token: string): Promise<EggAccount[]> => {
   const response = await fetch('/api/egg-accounts', {
     headers: {
@@ -145,13 +179,27 @@ const deleteEggAccount = async (token: string, id: string): Promise<void> => {
   await ensureOk(response)
 }
 
+const refreshEggAccount = async (token: string, eiUserId: string): Promise<EggAccountRefresh> => {
+  const response = await fetch(`/api/egg-accounts/refresh/${encodeURIComponent(eiUserId)}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+
+  await ensureOk(response)
+  return (await response.json()) as EggAccountRefresh
+}
+
 export const userApi = {
   login,
+  register,
   getCurrentUser,
   updateCurrentUser,
   getEggAccounts,
   createEggAccount,
   updateEggAccount,
-  deleteEggAccount
+  deleteEggAccount,
+  refreshEggAccount
 }
 
