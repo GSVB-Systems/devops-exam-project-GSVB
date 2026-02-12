@@ -12,7 +12,7 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
   const { login, isLoading, error, token, expiresInSeconds } = useLogin()
   const navigate = useNavigate()
   const location = useLocation()
-  const redirectPath = ((location.state as { from?: Location })?.from?.pathname ?? '/')
+  const redirectPath = '/'
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

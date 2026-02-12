@@ -4,8 +4,10 @@ namespace DevOpsAppRepo.Entities;
 
 public class UserEggSnapshot
 {
+    public string Id { get; set; } = string.Empty;
     public string UserId { get; set; } = string.Empty;
-    public string? EiUserId { get; set; }
+    public string EiUserId { get; set; } = string.Empty;
+    public string Status { get; set; } = "Alt";
     public string? UserName { get; set; }
     public ulong? BoostsUsed { get; set; }
     public double? SoulEggs { get; set; }

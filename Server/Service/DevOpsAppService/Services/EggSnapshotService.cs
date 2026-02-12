@@ -24,7 +24,7 @@ public class EggSnapshotService : IEggSnapshotService
         _snapshotRepository = snapshotRepository;
     }
 
-    public async Task<EggSnapshotResultDto?> FetchAndSaveAsync(
+    public async Task<EggAccountRefreshDto?> FetchAndSaveAsync(
         string userId,
         string eiUserId,
         CancellationToken cancellationToken = default)
@@ -38,7 +38,7 @@ public class EggSnapshotService : IEggSnapshotService
         if (user is null)
             return null;
 
-        var existing = await _snapshotRepository.GetByIdAsync(userId);
+        var existing = await _snapshotRepository.GetByUserAndEiUserIdAsync(userId, eiUserId);
         var now = DateTime.UtcNow;
 
         if (existing is not null && now - existing.LastFetchedUtc < MinFetchInterval)
@@ -63,7 +63,7 @@ public class EggSnapshotService : IEggSnapshotService
                 await _snapshotRepository.SaveChangesAsync();
             }
 
-            return new EggSnapshotResultDto
+            return new EggAccountRefreshDto
             {
                 UserName = existing.UserName,
                 SoulEggs = existing.SoulEggs,
@@ -88,6 +88,14 @@ public class EggSnapshotService : IEggSnapshotService
             : response.EiUserId;
         if (string.IsNullOrWhiteSpace(resolvedEiUserId))
             resolvedEiUserId = eiUserId;
+
+        if (string.IsNullOrWhiteSpace(resolvedEiUserId))
+            return null;
+
+        if (existing is null)
+        {
+            existing = await _snapshotRepository.GetByUserAndEiUserIdAsync(userId, resolvedEiUserId);
+        }
 
         var backup = response.Backup;
         var stats = backup?.Stats;
@@ -142,10 +150,15 @@ public class EggSnapshotService : IEggSnapshotService
 
         if (existing is null)
         {
+            var mainAccount = await _snapshotRepository.GetMainByUserIdAsync(userId);
+            var status = mainAccount is null ? "Main" : "Alt";
+
             existing = new UserEggSnapshot
             {
+                Id = Guid.NewGuid().ToString(),
                 UserId = userId,
                 EiUserId = resolvedEiUserId,
+                Status = status,
                 UserName = userName,
                 BoostsUsed = boostsUsed,
                 SoulEggs = soulEggs,
@@ -167,6 +180,10 @@ public class EggSnapshotService : IEggSnapshotService
         else
         {
             existing.EiUserId = resolvedEiUserId;
+            if (string.IsNullOrWhiteSpace(existing.Status))
+            {
+                existing.Status = "Alt";
+            }
             existing.UserName = userName;
             existing.BoostsUsed = boostsUsed;
             existing.SoulEggs = soulEggs;
@@ -187,7 +204,7 @@ public class EggSnapshotService : IEggSnapshotService
 
         await _snapshotRepository.SaveChangesAsync();
 
-        return new EggSnapshotResultDto
+        return new EggAccountRefreshDto
         {
             UserName = existing.UserName,
             SoulEggs = existing.SoulEggs,

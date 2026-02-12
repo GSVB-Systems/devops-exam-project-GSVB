@@ -65,7 +65,8 @@ public class EggSnapshotTests(
             GoldenEggsBalance = 75,
             CraftingXp = 2.5,
             LastFetchedUtc = lastFetchedUtc,
-            RawJson = "{\"ok\":true}"
+              RawJson = "{\"ok\":true}",
+              Id = Guid.NewGuid().ToString()
         });
         await ctx.SaveChangesAsync(ct);
 
@@ -121,8 +122,8 @@ public class EggSnapshotTests(
     {
         var created = await userService.CreateAsync(new CreateUserDto
         {
-            FirstName = "Test",
-            LastName = "User",
+            Username = "test-user",
+            DiscordUsername = "test-discord",
             Email = $"{seed}@test.it",
             Password = "JegKanHuskeDenneKode123!"
         });
@@ -145,6 +146,7 @@ public class EggSnapshotTests(
                 },
                 Game = new Backup.Types.Game
                 {
+                    Status = "Main",
                     SoulEggsD = 1234D,
                     EggsOfProphecy = 7,
                     GoldenEggsEarned = 1000,

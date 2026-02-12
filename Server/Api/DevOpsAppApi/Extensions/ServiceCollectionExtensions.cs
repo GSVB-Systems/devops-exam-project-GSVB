@@ -87,6 +87,7 @@ public static class ServiceCollectionExtensions
         services.AddOpenApiDocument();
         services.AddScoped<IUserEggSnapshotRepository, UserEggSnapshotRepository>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IEggAccountService, EggAccountService>();
         services.AddScoped<IEggSnapshotService, EggSnapshotService>();
         services.AddScoped<PasswordService>();
         services.AddScoped<ISieveProcessor, SieveProcessor>();
