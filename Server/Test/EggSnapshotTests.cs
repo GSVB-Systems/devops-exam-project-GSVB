@@ -3,8 +3,6 @@ using DevOpsAppRepo;
 using DevOpsAppRepo.Entities;
 using DevOpsAppService.Interfaces;
 using Ei;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Test;
 
@@ -25,11 +23,24 @@ public class EggSnapshotTests(
         Assert.True(result!.WasFetched);
         Assert.Equal(userId, result.UserId);
         Assert.Equal(result.LastFetchedUtc.AddMinutes(5), result.NextAllowedFetchUtc);
-        Assert.Equal(HashEiUserId("ei-123"), result.EiUserIdHash);
+        Assert.Equal("ei-123", result.EiUserId);
+        Assert.Equal("TestName", result.UserName);
+        Assert.Equal(1234D, result.SoulEggs);
+        Assert.Equal((ulong)7, result.EggsOfProphecy);
+        Assert.Equal((ulong)5, result.TruthEggs);
+        Assert.Equal(750, result.GoldenEggsBalance);
 
         var snapshot = ctx.UserEggSnapshots.Single(s => s.UserId == userId);
-        Assert.Equal(HashEiUserId("ei-123"), snapshot.EiUserIdHash);
+        Assert.Equal("ei-123", snapshot.EiUserId);
+        Assert.Equal("TestName", snapshot.UserName);
         Assert.Equal((ulong)42, snapshot.BoostsUsed);
+        Assert.Equal(1234D, snapshot.SoulEggs);
+        Assert.Equal((ulong)7, snapshot.EggsOfProphecy);
+        Assert.Equal((ulong)5, snapshot.TruthEggs);
+        Assert.Equal((ulong)1000, snapshot.GoldenEggsEarned);
+        Assert.Equal((ulong)250, snapshot.GoldenEggsSpent);
+        Assert.Equal(750, snapshot.GoldenEggsBalance);
+        Assert.Equal(12.5D, snapshot.CraftingXp);
         Assert.False(string.IsNullOrWhiteSpace(snapshot.RawJson));
     }
 
@@ -43,8 +54,16 @@ public class EggSnapshotTests(
         ctx.UserEggSnapshots.Add(new UserEggSnapshot
         {
             UserId = userId,
-            EiUserIdHash = "hash",
+            EiUserId = "ei-previous",
+            UserName = "CachedUser",
             BoostsUsed = 1,
+            SoulEggs = 55,
+            EggsOfProphecy = 2,
+            TruthEggs = 3,
+            GoldenEggsEarned = 100,
+            GoldenEggsSpent = 25,
+            GoldenEggsBalance = 75,
+            CraftingXp = 2.5,
             LastFetchedUtc = lastFetchedUtc,
             RawJson = "{\"ok\":true}"
         });
@@ -56,7 +75,12 @@ public class EggSnapshotTests(
 
         Assert.NotNull(result);
         Assert.False(result!.WasFetched);
-        Assert.Equal("hash", result.EiUserIdHash);
+        Assert.Equal("ei-previous", result.EiUserId);
+        Assert.Equal("CachedUser", result.UserName);
+        Assert.Equal(55D, result.SoulEggs);
+        Assert.Equal((ulong)2, result.EggsOfProphecy);
+        Assert.Equal((ulong)3, result.TruthEggs);
+        Assert.Equal(75, result.GoldenEggsBalance);
         Assert.Equal(lastFetchedUtc, result.LastFetchedUtc);
         Assert.Equal(lastFetchedUtc.AddMinutes(5), result.NextAllowedFetchUtc);
         Assert.Equal(0, fakeEggApiClient.CallCount);
@@ -114,18 +138,28 @@ public class EggSnapshotTests(
             Backup = new Backup
             {
                 EiUserId = eiUserId,
+                UserName = "TestName",
                 Stats = new Backup.Types.Stats
                 {
                     BoostsUsed = boostsUsed
+                },
+                Game = new Backup.Types.Game
+                {
+                    SoulEggsD = 1234D,
+                    EggsOfProphecy = 7,
+                    GoldenEggsEarned = 1000,
+                    GoldenEggsSpent = 250,
+                    UncliamedGoldenEggs = 10
+                },
+                Virtue = new Backup.Types.Virtue
+                {
+                    EovEarned = { 5 }
+                },
+                Artifacts = new Backup.Types.Artifacts
+                {
+                    CraftingXp = 12.5D
                 }
             }
         };
-    }
-
-    private static string HashEiUserId(string eiUserId)
-    {
-        var bytes = Encoding.UTF8.GetBytes(eiUserId);
-        var hash = SHA256.HashData(bytes);
-        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

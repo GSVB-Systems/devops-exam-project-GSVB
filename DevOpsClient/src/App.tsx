@@ -1,13 +1,24 @@
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import Login from './components/Login'
-import EggSnapshotCard from './components/EggSnapshotCard'
+import ProtectedRoute from './components/ProtectedRoute'
+import LoginPage from './pages/LoginPage.tsx'
+import MainPage from './pages/MainPage.tsx'
 
 function App() {
   return (
     <div className="app-root min-h-screen bg-base-200 py-10 flex items-center justify-center">
-      <div className="app-inner w-full max-w-4xl px-4 space-y-6">
-        <EggSnapshotCard />
-        <Login />
+      <div className="app-inner w-full px-4 space-y-6">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MainPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
       </div>
     </div>
   )

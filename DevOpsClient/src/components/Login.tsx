@@ -1,4 +1,5 @@
 ﻿import { useState } from 'react'
+import { type Location, useLocation, useNavigate } from 'react-router-dom'
 import { useLogin } from '../hooks/useLogin'
 
 type LoginProps = {
@@ -9,6 +10,9 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { login, isLoading, error, token, expiresInSeconds } = useLogin()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const redirectPath = ((location.state as { from?: Location })?.from?.pathname ?? '/')
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -21,6 +25,7 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
     const result = await login({ email: trimmedEmail, password })
     if (result?.accessToken) {
       onLoginSuccess?.(result.accessToken)
+      navigate(redirectPath, { replace: true })
     }
   }
 

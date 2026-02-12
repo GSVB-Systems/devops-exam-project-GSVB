@@ -3,8 +3,7 @@ using DevOpsAppRepo.Entities;
 using DevOpsAppRepo.Interfaces;
 using DevOpsAppService.Interfaces;
 using Google.Protobuf;
-using System.Security.Cryptography;
-using System.Text;
+using System.Linq;
 
 namespace DevOpsAppService.Services;
 
@@ -44,10 +43,36 @@ public class EggSnapshotService : IEggSnapshotService
 
         if (existing is not null && now - existing.LastFetchedUtc < MinFetchInterval)
         {
+            var recalculated = EggSnapshotFormulas.Calculate(
+                existing.SoulEggs,
+                existing.EggsOfProphecy,
+                existing.BoostsUsed,
+                existing.CraftingXp,
+                existing.GoldenEggsBalance,
+                existing.GoldenEggsSpent,
+                existing.TruthEggs,
+                null,
+                null);
+            var mer = recalculated.Mer ?? existing.Mer;
+            var jer = recalculated.Jer ?? existing.Jer;
+            if (mer != existing.Mer || jer != existing.Jer)
+            {
+                existing.Mer = mer;
+                existing.Jer = jer;
+                await _snapshotRepository.UpdateAsync(existing);
+                await _snapshotRepository.SaveChangesAsync();
+            }
+
             return new EggSnapshotResultDto
             {
-                UserId = userId,
-                EiUserIdHash = existing.EiUserIdHash,
+                UserName = existing.UserName,
+                SoulEggs = existing.SoulEggs,
+                EggsOfProphecy = existing.EggsOfProphecy,
+                TruthEggs = existing.TruthEggs,
+                GoldenEggsBalance = existing.GoldenEggsBalance,
+                Mer = mer,
+                Jer = jer,
+                Eb = existing.Eb,
                 LastFetchedUtc = existing.LastFetchedUtc,
                 NextAllowedFetchUtc = existing.LastFetchedUtc.Add(MinFetchInterval),
                 WasFetched = false
@@ -64,18 +89,76 @@ public class EggSnapshotService : IEggSnapshotService
         if (string.IsNullOrWhiteSpace(resolvedEiUserId))
             resolvedEiUserId = eiUserId;
 
-        var eiUserIdHash = HashEiUserId(resolvedEiUserId);
-        var boostsUsed = response.Backup?.Stats?.HasBoostsUsed == true
-            ? response.Backup.Stats.BoostsUsed
+        var backup = response.Backup;
+        var stats = backup?.Stats;
+        var game = backup?.Game;
+        var artifacts = backup?.Artifacts;
+        var virtue = backup?.Virtue;
+
+        var userName = backup?.HasUserName == true ? backup.UserName : null;
+        var boostsUsed = stats?.HasBoostsUsed == true
+            ? stats.BoostsUsed
             : (ulong?)null;
+        var soulEggs = game?.HasSoulEggsD == true
+            ? game.SoulEggsD
+            : (game?.HasSoulEggs == true ? game.SoulEggs : (double?)null);
+        var eggsOfProphecy = game?.HasEggsOfProphecy == true
+            ? game.EggsOfProphecy
+            : (ulong?)null;
+        ulong? truthEggs = null;
+        if (virtue?.EovEarned is not null && virtue.EovEarned.Count > 0)
+        {
+            truthEggs = (ulong)virtue.EovEarned.Sum(value => (long)value);
+        }
+        var goldenEggsEarned = game?.HasGoldenEggsEarned == true
+            ? game.GoldenEggsEarned
+            : (ulong?)null;
+        var goldenEggsSpent = game?.HasGoldenEggsSpent == true
+            ? game.GoldenEggsSpent
+            : (ulong?)null;
+        long? goldenEggsBalance = null;
+        if (goldenEggsEarned.HasValue || goldenEggsSpent.HasValue)
+        {
+            goldenEggsBalance = (long)(goldenEggsEarned ?? 0)
+                                 - (long)(goldenEggsSpent ?? 0);
+        }
+        var craftingXp = artifacts?.HasCraftingXp == true
+            ? artifacts.CraftingXp
+            : (double?)null;
+        var epicResearch = game?.EpicResearch;
+        var soulFoodLevels = GetEpicResearchLevel(epicResearch, "soul_eggs");
+        var prophecyBonusLevels = GetEpicResearchLevel(epicResearch, "prophecy_bonus");
+
+        var calculated = EggSnapshotFormulas.Calculate(
+            soulEggs,
+            eggsOfProphecy,
+            boostsUsed,
+            craftingXp,
+            goldenEggsBalance,
+            goldenEggsSpent,
+            truthEggs,
+            soulFoodLevels,
+            prophecyBonusLevels);
 
         if (existing is null)
         {
             existing = new UserEggSnapshot
             {
                 UserId = userId,
-                EiUserIdHash = eiUserIdHash,
+                EiUserId = resolvedEiUserId,
+                UserName = userName,
                 BoostsUsed = boostsUsed,
+                SoulEggs = soulEggs,
+                EggsOfProphecy = eggsOfProphecy,
+                TruthEggs = truthEggs,
+                GoldenEggsEarned = goldenEggsEarned,
+                GoldenEggsSpent = goldenEggsSpent,
+                GoldenEggsBalance = goldenEggsBalance,
+                CraftingXp = craftingXp,
+                Mer = calculated.Mer,
+                Jer = calculated.Jer,
+                Cer = calculated.Cer,
+                Eb = calculated.Eb,
                 LastFetchedUtc = now,
                 RawJson = rawJson
             };
@@ -83,8 +166,20 @@ public class EggSnapshotService : IEggSnapshotService
         }
         else
         {
-            existing.EiUserIdHash = eiUserIdHash;
+            existing.EiUserId = resolvedEiUserId;
+            existing.UserName = userName;
             existing.BoostsUsed = boostsUsed;
+            existing.SoulEggs = soulEggs;
+            existing.EggsOfProphecy = eggsOfProphecy;
+            existing.TruthEggs = truthEggs;
+            existing.GoldenEggsEarned = goldenEggsEarned;
+            existing.GoldenEggsSpent = goldenEggsSpent;
+            existing.GoldenEggsBalance = goldenEggsBalance;
+            existing.CraftingXp = craftingXp;
+            existing.Mer = calculated.Mer;
+            existing.Jer = calculated.Jer;
+            existing.Cer = calculated.Cer;
+            existing.Eb = calculated.Eb;
             existing.LastFetchedUtc = now;
             existing.RawJson = rawJson;
             await _snapshotRepository.UpdateAsync(existing);
@@ -94,22 +189,37 @@ public class EggSnapshotService : IEggSnapshotService
 
         return new EggSnapshotResultDto
         {
-            UserId = userId,
-            EiUserIdHash = existing.EiUserIdHash,
+            UserName = existing.UserName,
+            SoulEggs = existing.SoulEggs,
+            EggsOfProphecy = existing.EggsOfProphecy,
+            TruthEggs = existing.TruthEggs,
+            GoldenEggsBalance = existing.GoldenEggsBalance,
+            Mer = existing.Mer,
+            Jer = existing.Jer,
+            Eb = existing.Eb,
             LastFetchedUtc = existing.LastFetchedUtc,
             NextAllowedFetchUtc = existing.LastFetchedUtc.Add(MinFetchInterval),
             WasFetched = true
         };
     }
 
-    private static string? HashEiUserId(string? eiUserId)
+    private static uint? GetEpicResearchLevel(
+        global::Google.Protobuf.Collections.RepeatedField<global::Ei.Backup.Types.ResearchItem>? items,
+        string researchId)
     {
-        if (string.IsNullOrWhiteSpace(eiUserId))
+        if (items is null || items.Count == 0)
+        {
             return null;
+        }
 
-        var bytes = Encoding.UTF8.GetBytes(eiUserId);
-        var hash = SHA256.HashData(bytes);
-        return Convert.ToHexString(hash).ToLowerInvariant();
+        foreach (var item in items)
+        {
+            if (string.Equals(item.Id, researchId, StringComparison.OrdinalIgnoreCase))
+            {
+                return item.Level;
+            }
+        }
+
+        return null;
     }
-
 }

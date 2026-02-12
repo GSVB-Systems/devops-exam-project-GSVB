@@ -3,6 +3,7 @@ using System;
 using DevOpsAppRepo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DevOpsAppRepo.Migrations
 {
     [DbContext(typeof(DevOpsAppDbContext))]
-    partial class DevOpsAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212103236_changes")]
+    partial class changes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,6 +100,9 @@ namespace DevOpsAppRepo.Migrations
                         .HasColumnType("double precision");
 
                     b.Property<decimal?>("TruthEggs")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal?>("UnclaimedGoldenEggs")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("UserName")
