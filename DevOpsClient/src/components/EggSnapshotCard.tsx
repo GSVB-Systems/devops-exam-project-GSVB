@@ -1,15 +1,18 @@
 import React, { useState } from 'react'
 import '../App.css'
 
-const EggSnapshotCard: React.FC = () => {
-  const [eiUserId, setEiUserId] = useState('')
+type EggSnapshotCardProps = {
+  eiUserId: string | null
+}
+
+const EggSnapshotCard: React.FC<EggSnapshotCardProps> = ({ eiUserId }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<Record<string, unknown> | null>(null)
 
   const handleRefresh = async () => {
-    if (!eiUserId.trim()) {
-      setError('Ei User ID is required.')
+    if (!eiUserId) {
+      setError('Select an egg account first.')
       return
     }
 
@@ -24,7 +27,7 @@ const EggSnapshotCard: React.FC = () => {
     setResult(null)
 
     try {
-      const response = await fetch(`/api/egg-snapshots/refresh/${encodeURIComponent(eiUserId)}`, {
+      const response = await fetch(`/api/egg-accounts/refresh/${encodeURIComponent(eiUserId)}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
@@ -52,31 +55,18 @@ const EggSnapshotCard: React.FC = () => {
       <div className="card-body">
         <h2 className="card-title">Egg Snapshot Refresh</h2>
 
-        <div className="form-control">
-          <label htmlFor="eiUserId" className="label">
-            <span className="label-text">Ei User ID</span>
-          </label>
-          <input
-            id="eiUserId"
-            type="text"
-            value={eiUserId}
-            onChange={(event) => setEiUserId(event.target.value)}
-            placeholder="Enter Ei User ID"
-            autoComplete="off"
-            className="input input-bordered w-full"
-          />
-        </div>
-
         <div className="form-control mt-4">
           <button
             type="button"
             onClick={handleRefresh}
-            disabled={isLoading}
+            disabled={isLoading || !eiUserId}
             className={`btn btn-primary ${isLoading ? 'loading' : ''}`}
           >
             {isLoading ? 'Refreshing...' : 'Refresh Snapshot'}
           </button>
         </div>
+
+        {!eiUserId ? <p className="text-sm opacity-70 mt-2">Choose an egg account to refresh.</p> : null}
 
         {error ? <p className="text-error mt-2">{error}</p> : null}
 

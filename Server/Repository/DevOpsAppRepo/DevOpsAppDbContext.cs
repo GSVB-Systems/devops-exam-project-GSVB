@@ -60,16 +60,21 @@ public class DevOpsAppDbContext : DbContext
         {
             eb.HasKey(u => u.UserId);
             eb.Property(u => u.UserId).IsRequired();
+            eb.Property(u => u.Username).IsRequired();
             eb.Property(u => u.Email).IsRequired();
         });
 
         modelBuilder.Entity<UserEggSnapshot>(eb =>
         {
-            eb.HasKey(s => s.UserId);
+            eb.HasKey(s => s.Id);
+            eb.Property(s => s.Id).IsRequired();
             eb.Property(s => s.UserId).IsRequired();
+            eb.Property(s => s.EiUserId).IsRequired();
+            eb.Property(s => s.Status).IsRequired();
             eb.Property(s => s.LastFetchedUtc).IsRequired();
             eb.Property(s => s.RawJson).HasColumnType("jsonb").IsRequired();
-            eb.HasOne<User>().WithOne().HasForeignKey<UserEggSnapshot>(s => s.UserId);
+            eb.HasIndex(s => new { s.UserId, s.EiUserId }).IsUnique();
+            eb.HasOne<User>().WithMany().HasForeignKey(s => s.UserId);
         });
 
         base.OnModelCreating(modelBuilder);

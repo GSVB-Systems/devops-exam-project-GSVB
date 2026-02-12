@@ -3,6 +3,7 @@ using DevOpsAppService.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
+using System.Security.Claims;
 
 namespace DevOpsAppApi.Controllers;
 
@@ -15,6 +16,30 @@ public class UserController : ControllerBase
     public UserController(IUserService userService)
     {
         _userService = userService;
+    }
+
+    [Authorize]
+    [HttpGet("me")]
+    public async Task<ActionResult<UserDto>> GetMe()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userId))
+            return Unauthorized();
+
+        var user = await _userService.GetByIdAsync(userId);
+        return user is null ? NotFound() : Ok(user);
+    }
+
+    [Authorize]
+    [HttpPut("me")]
+    public async Task<ActionResult<UserDto>> UpdateMe([FromBody] UpdateUserDto dto)
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrWhiteSpace(userId))
+            return Unauthorized();
+
+        var updated = await _userService.UpdateAsync(userId, dto);
+        return updated is null ? NotFound() : Ok(updated);
     }
 
     [Authorize]
@@ -33,7 +58,7 @@ public class UserController : ControllerBase
         return user is null ? NotFound() : Ok(user);
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpPost("createUser")]
     public async Task<ActionResult<UserDto>> Create([FromBody] CreateUserDto dto)
     {

@@ -1,6 +1,6 @@
 namespace DevOpsAppContracts.Models;
 
-public class EggSnapshotResultDto
+public class EggAccountRefreshDto
 {
     public string? UserName { get; set; }
     public double? SoulEggs { get; set; }

@@ -3,6 +3,7 @@ using System;
 using DevOpsAppRepo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DevOpsAppRepo.Migrations
 {
     [DbContext(typeof(DevOpsAppDbContext))]
-    partial class DevOpsAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212103926_remove_unclaimed")]
+    partial class remove_unclaimed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -27,10 +30,11 @@ namespace DevOpsAppRepo.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<string>("DiscordUsername")
+                    b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Email")
+                    b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -38,7 +42,7 @@ namespace DevOpsAppRepo.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -49,7 +53,7 @@ namespace DevOpsAppRepo.Migrations
 
             modelBuilder.Entity("DevOpsAppRepo.Entities.UserEggSnapshot", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<string>("UserId")
                         .HasColumnType("text");
 
                     b.Property<decimal?>("BoostsUsed")
@@ -68,7 +72,6 @@ namespace DevOpsAppRepo.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("EiUserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<long?>("GoldenEggsBalance")
@@ -96,24 +99,13 @@ namespace DevOpsAppRepo.Migrations
                     b.Property<double?>("SoulEggs")
                         .HasColumnType("double precision");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<decimal?>("TruthEggs")
                         .HasColumnType("numeric(20,0)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("UserName")
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "EiUserId")
-                        .IsUnique();
+                    b.HasKey("UserId");
 
                     b.ToTable("UserEggSnapshots");
                 });
@@ -121,8 +113,8 @@ namespace DevOpsAppRepo.Migrations
             modelBuilder.Entity("DevOpsAppRepo.Entities.UserEggSnapshot", b =>
                 {
                     b.HasOne("DevOpsAppRepo.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne()
+                        .HasForeignKey("DevOpsAppRepo.Entities.UserEggSnapshot", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

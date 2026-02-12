@@ -57,6 +57,8 @@ public class UserService : IUserService
     public async Task<UserDto> CreateAsync(CreateUserDto createDto)
     {
         if (createDto is null) throw new ArgumentNullException(nameof(createDto));
+        if (string.IsNullOrWhiteSpace(createDto.Username))
+            throw new ArgumentException("Username is required.", nameof(createDto));
         if (string.IsNullOrWhiteSpace(createDto.Password))
             throw new ArgumentException("Password is required.", nameof(createDto));
 
@@ -78,6 +80,9 @@ public class UserService : IUserService
         var existing = await _userRepository.GetByIdAsync(id);
         if (existing is null)
             return null;
+
+        if (updateDto.Username is not null && string.IsNullOrWhiteSpace(updateDto.Username))
+            throw new ArgumentException("Username cannot be empty when provided.", nameof(updateDto));
 
         UserMapper.Apply(updateDto, existing);
 

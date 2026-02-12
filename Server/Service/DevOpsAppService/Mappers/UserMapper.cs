@@ -10,8 +10,8 @@ public static class UserMapper
         return new UserDto
         {
             UserId = entity.UserId,
-            FirstName = entity.FirstName,
-            LastName = entity.LastName,
+            Username = entity.Username,
+            DiscordUsername = entity.DiscordUsername,
             Email = entity.Email
         };
     }
@@ -21,8 +21,8 @@ public static class UserMapper
         return new User
         {
             UserId = Guid.NewGuid().ToString(),
-            FirstName = dto.FirstName,
-            LastName = dto.LastName,
+            Username = dto.Username,
+            DiscordUsername = dto.DiscordUsername,
             Email = dto.Email,
             HashedPassword = string.Empty // set by UserService (hashed)
         };
@@ -30,8 +30,8 @@ public static class UserMapper
 
     public static void Apply(UpdateUserDto dto, User entity)
     {
-        if (dto.FirstName is not null) entity.FirstName = dto.FirstName;
-        if (dto.LastName is not null) entity.LastName = dto.LastName;
+        if (dto.Username is not null) entity.Username = dto.Username;
+        if (dto.DiscordUsername is not null) entity.DiscordUsername = dto.DiscordUsername;
         if (dto.Email is not null) entity.Email = dto.Email;
         // Password hashing is handled in UserService; don't assign dto.Password here.
     }
