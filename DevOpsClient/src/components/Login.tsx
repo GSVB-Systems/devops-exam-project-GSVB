@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useLogin } from '../hooks/useLogin'
 
 type LoginProps = {
@@ -73,7 +73,7 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
       {error ? <p className="text-error mt-4">{error}</p> : null}
 
       <div className="mt-6 text-sm opacity-70">
-        New here? <a href="/register" className="link">Create an account</a>
+        New here? <Link to="/register" className="link">Create an account</Link>
       </div>
 
       {token ? (
