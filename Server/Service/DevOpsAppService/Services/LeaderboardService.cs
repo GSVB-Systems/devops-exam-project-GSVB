@@ -25,15 +25,12 @@ public class LeaderboardService : ILeaderboardService
                                || snapshot.Jer.HasValue)
             .Select(snapshot => new LeaderboardEntryDto
             {
-                EiUserId = snapshot.EiUserId,
-                Status = snapshot.Status,
                 UserName = snapshot.UserName,
                 Eb = snapshot.Eb,
                 SoulEggs = snapshot.SoulEggs,
                 EggsOfProphecy = snapshot.EggsOfProphecy,
                 Mer = snapshot.Mer,
                 Jer = snapshot.Jer,
-                LastFetchedUtc = snapshot.LastFetchedUtc
             })
             .OrderByDescending(entry => entry.Eb ?? 0d);
 
