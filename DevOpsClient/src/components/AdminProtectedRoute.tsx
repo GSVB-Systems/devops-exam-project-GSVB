@@ -8,7 +8,7 @@ const AdminProtectedRoute = ({ children }: { children: ReactElement }) => {
   const location = useLocation()
   const role = getRoleFromJwt(token)
 
-  if (role !== 'Administrator') {
+  if (role !== 'Admin') {
     return <Navigate to="/login" replace state={{ from: location }} />
   }
 

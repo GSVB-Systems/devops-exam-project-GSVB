@@ -11,7 +11,7 @@ const Login = ({ onLoginSuccess }: LoginProps) => {
   const [password, setPassword] = useState('')
   const { login, isLoading, error, token, expiresInSeconds } = useLogin()
   const navigate = useNavigate()
-  const redirectPath = '/'
+  const redirectPath = '/Dashboard'
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

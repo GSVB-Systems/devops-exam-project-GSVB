@@ -6,6 +6,10 @@ import LeaderboardsPage from './pages/LeaderboardsPage.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import MainPage from './pages/MainPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
+import AdminDashboard from './pages/Dashboard.tsx'
+import AdminPage from './pages/AdminPage.tsx'
+import AdminProtectedRoute from './components/AdminProtectedRoute.tsx'
+import UserListPage from './pages/UserListPage.tsx'
 
 function App() {
   return (
@@ -34,6 +38,30 @@ function App() {
               <ProtectedRoute>
                 <LeaderboardsPage />
               </ProtectedRoute>
+            }
+          />
+          <Route
+                path="/dashboard"
+                element={
+                    <ProtectedRoute>
+                        <AdminDashboard />
+                    </ProtectedRoute>
+                }
+          />
+          <Route
+              path="/AdminPage"
+                element={
+                    <AdminProtectedRoute>
+                        <AdminPage />
+                    </AdminProtectedRoute>
+                }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminProtectedRoute>
+                <UserListPage />
+              </AdminProtectedRoute>
             }
           />
           <Route path="/login" element={<LoginPage />} />
