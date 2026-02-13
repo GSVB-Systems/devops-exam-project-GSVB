@@ -13,6 +13,7 @@ using System.Text;
 using DevOpsAppService.EggApi;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
+using api;
 using DevOpsAppApi.Extensions;
 
 
@@ -21,6 +22,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApiServices(builder.Configuration);
 
 var app = builder.Build();
+
+app.GenerateApiClientsFromOpenApi("/../../../DevOpsClient/src/api/ServerApi.ts").GetAwaiter().GetResult();
+
 
 app.UseOpenApi();
 app.UseSwaggerUi();

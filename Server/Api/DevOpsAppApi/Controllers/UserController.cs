@@ -42,7 +42,7 @@ public class UserController : ControllerBase
         return updated is null ? NotFound() : Ok(updated);
     }
 
-    [Authorize]
+    [Authorize (Roles = "Admin")]
     [HttpGet("getAllUsers")]
     public async Task<ActionResult<PagedResult<UserDto>>> GetAll([FromQuery] SieveModel? parameters)
     {
