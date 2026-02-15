@@ -123,6 +123,7 @@ const UserListPage = () => {
                   </th>
                   <th className="py-2 pr-4">Role</th>
                   <th className="py-2 pr-4">ID</th>
+                  <th className="py-2 pr-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -131,10 +132,27 @@ const UserListPage = () => {
                     key={user.userId ?? `${user.username ?? user.email ?? 'user'}-${index}`}
                     className="border-b border-gray-700/30"
                   >
-                    <td className="py-2 pr-4 font-semibold">{user.username ?? 'Unknown'}</td>
+                    <td className="py-2 pr-4 font-semibold">
+                      {user.userId ? (
+                        <Link to={`/admin/users/${user.userId}`} className="link link-primary">
+                          {user.username ?? 'Unknown'}
+                        </Link>
+                      ) : (
+                        user.username ?? 'Unknown'
+                      )}
+                    </td>
                     <td className="py-2 pr-4">{user.email ?? '—'}</td>
                     <td className="py-2 pr-4">{user.role ?? '—'}</td>
                     <td className="py-2 pr-4 text-xs text-gray-300/80">{user.userId ?? '—'}</td>
+                    <td className="py-2 pr-4">
+                      {user.userId ? (
+                        <Link to={`/admin/users/${user.userId}`} className="btn btn-xs btn-outline">
+                          Details
+                        </Link>
+                      ) : (
+                        <span className="text-xs opacity-70">No id</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

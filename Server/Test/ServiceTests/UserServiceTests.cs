@@ -18,6 +18,38 @@ public class UserServiceTests(IUserService userService, DevOpsAppDbContext ctx)
     }
     
     [Fact]
+    
+    public async Task UpdateUserValid()
+    {
+        var user = UserTestData.CreateUser();
+        var CreatedUser = await userService.CreateAsync(user);
+
+        var updateDto = UserTestData.UpdateUserFaker
+            .Clone()
+            .RuleFor(x => x.Email, _ => user.Email)
+            .RuleFor(x => x.Username, _ => user.Username)
+            .Generate();
+
+        var updatedUser = await userService.UpdateAsync(CreatedUser.UserId,updateDto);
+
+        Assert.NotNull(updatedUser);
+        Assert.Equal(updateDto.Username, updatedUser!.Username);
+        Assert.Equal(updateDto.Email, updatedUser.Email);
+    }
+    
+    [Fact]
+    public async Task DeleteUserValid()
+    {
+        var user = UserTestData.CreateUser();
+        var createdUser = await userService.CreateAsync(user);
+
+        var deleted = await userService.DeleteAsync(createdUser.UserId);
+
+        Assert.True(deleted);
+        Assert.False(ctx.Users.Any(u => u.UserId == createdUser.UserId));
+    }
+    
+    [Fact]
     public async Task LoginValid()
     {
         var user = UserTestData.CreateUser();

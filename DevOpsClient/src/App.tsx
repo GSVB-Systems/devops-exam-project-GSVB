@@ -10,6 +10,7 @@ import AdminDashboard from './pages/Dashboard.tsx'
 import AdminPage from './pages/AdminPage.tsx'
 import AdminProtectedRoute from './components/AdminProtectedRoute.tsx'
 import UserListPage from './pages/UserListPage.tsx'
+import UserDetailPage from './pages/UserDetailPage.tsx'
 
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
             element={
               <AdminProtectedRoute>
                 <UserListPage />
+              </AdminProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users/:userId"
+            element={
+              <AdminProtectedRoute>
+                <UserDetailPage />
               </AdminProtectedRoute>
             }
           />

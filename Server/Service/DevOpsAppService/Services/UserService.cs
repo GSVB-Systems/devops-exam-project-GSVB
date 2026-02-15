@@ -61,6 +61,7 @@ public class UserService : IUserService
             throw new ArgumentException("Username is required.", nameof(createDto));
         if (string.IsNullOrWhiteSpace(createDto.Password))
             throw new ArgumentException("Password is required.", nameof(createDto));
+        
 
         var entity = UserMapper.ToEntity(createDto);
         entity.HashedPassword = _passwordService.HashPassword(createDto.Password);
