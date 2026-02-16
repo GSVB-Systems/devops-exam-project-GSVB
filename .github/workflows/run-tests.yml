@@ -30,18 +30,5 @@ jobs:
       - name: Build solution
         run: dotnet build DevOpsApp.slnx --configuration Release --no-restore
 
-      - name: Create test results directory
-        run: mkdir -p Server/Test/TestResults
-
-      - name: Run unit tests with report
-        run: >-
-          dotnet test --project Server/Test/Test.csproj --configuration Release --no-build
-          --logger "trx;LogFileName=test-results.trx"
-          --results-directory Server/Test/TestResults
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dotnet-test-results
-          path: Server/Test/TestResults/*.trx
+      - name: Run unit tests
+        run: dotnet test --project Server/Test/Test.csproj --configuration Release --no-build
