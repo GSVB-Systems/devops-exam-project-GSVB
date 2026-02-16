@@ -35,7 +35,7 @@ jobs:
 
       - name: Run unit tests with report
         run: >-
-          dotnet test --solution DevOpsApp.slnx --configuration Release --no-build
+          dotnet test Server/Test/Test.csproj --configuration Release --no-build
           --logger "trx;LogFileName=test-results.trx"
           --results-directory Server/Test/TestResults
 
