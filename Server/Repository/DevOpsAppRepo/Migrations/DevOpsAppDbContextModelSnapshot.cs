@@ -27,11 +27,10 @@ namespace DevOpsAppRepo.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
+                    b.Property<string>("DiscordUsername")
                         .HasColumnType("text");
 
-                    b.Property<string>("FirstName")
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -39,7 +38,11 @@ namespace DevOpsAppRepo.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -50,23 +53,71 @@ namespace DevOpsAppRepo.Migrations
 
             modelBuilder.Entity("DevOpsAppRepo.Entities.UserEggSnapshot", b =>
                 {
-                    b.Property<string>("UserId")
+                    b.Property<string>("Id")
                         .HasColumnType("text");
 
                     b.Property<decimal?>("BoostsUsed")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<string>("EiUserIdHash")
+                    b.Property<double?>("Cer")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("CraftingXp")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Eb")
+                        .HasColumnType("double precision");
+
+                    b.Property<decimal?>("EggsOfProphecy")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("EiUserId")
+                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<long?>("GoldenEggsBalance")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal?>("GoldenEggsEarned")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal?>("GoldenEggsSpent")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<double?>("Jer")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime>("LastFetchedUtc")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("Mer")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("RawJson")
                         .IsRequired()
                         .HasColumnType("jsonb");
 
-                    b.HasKey("UserId");
+                    b.Property<double?>("SoulEggs")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("TruthEggs")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserName")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "EiUserId")
+                        .IsUnique();
 
                     b.ToTable("UserEggSnapshots");
                 });
@@ -74,8 +125,8 @@ namespace DevOpsAppRepo.Migrations
             modelBuilder.Entity("DevOpsAppRepo.Entities.UserEggSnapshot", b =>
                 {
                     b.HasOne("DevOpsAppRepo.Entities.User", null)
-                        .WithOne()
-                        .HasForeignKey("DevOpsAppRepo.Entities.UserEggSnapshot", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
