@@ -28,7 +28,7 @@ jobs:
         run: dotnet restore DevOpsApp.slnx
 
       - name: Build solution
-        run: dotnet build --solution DevOpsApp.slnx --configuration Release --no-restore
+        run: dotnet build DevOpsApp.slnx --configuration Release --no-restore
 
       - name: Create test results directory
         run: mkdir -p Server/Test/TestResults
