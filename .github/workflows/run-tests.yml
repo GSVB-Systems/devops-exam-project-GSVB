@@ -31,4 +31,6 @@ jobs:
         run: dotnet build DevOpsApp.slnx --configuration Release --no-restore
 
       - name: Run unit tests
+        env:
+          JWT__SECRET: temporary-ci-secret
         run: dotnet test --project Server/Test/Test.csproj --configuration Release --no-build
