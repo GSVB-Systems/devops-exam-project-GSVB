@@ -1,0 +1,47 @@
+name: CI - Unit Test
+
+on:
+  push:
+    branches:
+      - main
+      - Dev
+  pull_request:
+    branches:
+      - main
+      - Dev
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: server/global.json
+
+      - name: Restore dependencies
+        run: dotnet restore server/server.sln
+
+      - name: Build solution
+        run: dotnet build server/server.sln --configuration Release --no-restore
+
+      - name: Create test results directory
+        run: mkdir -p server/TestResults
+
+      - name: Run unit tests with report
+        run: >-
+          dotnet test server/server.sln --configuration Release --no-build
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory server/TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: server/TestResults/*.trx
