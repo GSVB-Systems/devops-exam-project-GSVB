@@ -33,5 +33,5 @@ jobs:
       - name: Run unit tests
         env:
           DOTNET_ENVIRONMENT: Development
-          JWT__SECRET: temporary-ci-secret
+          JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
         run: dotnet test --project Server/Test/Test.csproj --configuration Release --no-build
