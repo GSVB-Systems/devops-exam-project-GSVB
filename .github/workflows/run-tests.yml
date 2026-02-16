@@ -25,17 +25,17 @@ jobs:
           global-json-file: global.json
 
       - name: Restore dependencies
-        run: dotnet restore DevOpsApp.slnx
+        run: dotnet restore --solution DevOpsApp.slnx
 
       - name: Build solution
-        run: dotnet build DevOpsApp.slnx --configuration Release --no-restore
+        run: dotnet build --solution DevOpsApp.slnx --configuration Release --no-restore
 
       - name: Create test results directory
         run: mkdir -p Server/Test/TestResults
 
       - name: Run unit tests with report
         run: >-
-          dotnet test DevOpsApp.slnx --configuration Release --no-build
+          dotnet test --solution DevOpsApp.slnx --configuration Release --no-build
           --logger "trx;LogFileName=test-results.trx"
           --results-directory Server/Test/TestResults
 
