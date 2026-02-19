@@ -1,23 +1,14 @@
 # EggBoard
 
-> [!NOTE]
-> Provide a project title in the heading above. Just below this note write a short description of the application you plan to build.
-
 Leaderboard and data management application for Egg, Inc. With complementing open user webpage.
 
 ## Tech-stack
-
-> [!NOTE]
-> Write a short description of your tech-stack here in terms of programming language(s) and database engine(s).
 
 Typescript + React
 C Sharp
 [...]
 
 ## Architecture
-
-> [!NOTE]
-> Write a short explanation of your planned architecture here.
 
 Frontend with user statistics and more. (Login with EID)
 
@@ -28,31 +19,28 @@ Database storing user data pseudonymously
 
 ## Feature plan
 
-> [!NOTE]
-> For each week below write a short description of the features you plan to build for your project this week.
-
 [...]
 
 ### Week 5
 *Kick-off week - no features to be planned here*
 
 ### Week 6
-**Feature 1:** [...]
+**Feature 1:** Basic Login System
 
-**Feature 2:** [...]
+**Feature 2:** EggApi Data Fetch
 
 ### Week 7
 *Winter vacation - nothing planned.*
 
 ### Week 8
-**Feature 1:** [...]
+**Feature 1:** Account Linking with Alt Account Support
 
-**Feature 2:** [...]
+**Feature 2:** Stats Display
 
 ### Week 9
-**Feature 1:** [...]
+**Feature 1:** Leaderboards Page
 
-**Feature 2:** [...]
+**Feature 2:** Account Level Calculation
 
 ### Week 10
 **Feature 1:** [...]

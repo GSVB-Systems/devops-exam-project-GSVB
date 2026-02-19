@@ -1,0 +1,42 @@
+:root {
+  font-family: "Space Grotesk", "Trebuchet MS", "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: #f1ede6;
+  background-color: #2f3033;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  color: inherit;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #2f3033;
+  color: #f1ede6;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #2f3033;
+}
+
+html {
+  background-color: #2f3033;
+}
+

@@ -1,0 +1,37 @@
+name: CI - Unit Test
+
+on:
+  push:
+    branches:
+      - main
+      - Dev
+  pull_request:
+    branches:
+      - main
+      - Dev
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore dependencies
+        run: dotnet restore DevOpsApp.slnx
+
+      - name: Build solution
+        run: dotnet build DevOpsApp.slnx --configuration Release --no-restore
+
+      - name: Run unit tests
+        env:
+          DOTNET_ENVIRONMENT: Development
+          JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
+        run: dotnet test --project Server/Test/Test.csproj --configuration Release --no-build
