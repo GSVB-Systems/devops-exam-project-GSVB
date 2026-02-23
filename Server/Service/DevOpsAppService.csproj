@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Repository\DevOpsAppRepo\DevOpsAppRepo.csproj" />
-    <ProjectReference Include="..\..\Contracts\DevOpsAppContracts\DevOpsAppContracts.csproj" />
+    <ProjectReference Include="..\..\Repository\DevOpsAppRepo.csproj" />
+    <ProjectReference Include="..\..\Contracts\DevOpsAppContracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
