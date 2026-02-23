@@ -1,17 +1,17 @@
 ﻿name: Install required tools
 run: |
   dotnet tool install -g dotnet-sonarscanner
-    dotnet tool install -g dotnet-reportgenerator-globaltool
+  dotnet tool install -g dotnet-reportgenerator-globaltool
   
 - name: Start Static Code Analysis
   run: |
     dotnet sonarscanner begin 
-    /k:"$SONAR_KEY" \
-    /d:sonar.host.url="$SONAR_HOST" \
-    /d:sonar.token="$SONAR_TOKEN" \
-    /d:sonar.coverageReportPaths="coverage-report/SonarQube.xml" \
-    /d:sonar.qualitygate.wait=true \
-    /d:sonar.qualiutygate.timeout=300
+      /k:"$SONAR_KEY" \
+      /d:sonar.host.url="$SONAR_HOST" \
+      /d:sonar.token="$SONAR_TOKEN" \
+      /d:sonar.coverageReportPaths="coverage-report/SonarQube.xml" \
+      /d:sonar.qualitygate.wait=true \
+      /d:sonar.qualiutygate.timeout=300
     
 - name: Build the project
   run: dotnet build
