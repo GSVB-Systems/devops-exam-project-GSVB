@@ -1,0 +1,56 @@
+﻿name: DevOps Pipeline
+on:
+  push:
+    branches: [ main, Dev ]
+  pull_request:
+    branches: [ main, Dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install required tools
+      run: |
+        dotnet tool install -g dotnet-sonarscanner
+        dotnet tool install -g dotnet-reportgenerator-globaltool
+
+    - name: Start Static Code Analysis
+      env:
+        SONAR_HOST: ${{ secrets.SONAR_HOST }}
+        SONAR_KEY: ${{ secrets.SONAR_KEY }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        dotnet sonarscanner begin \
+          /k:"$SONAR_KEY" \
+          /d:sonar.host.url="$SONAR_HOST" \
+          /d:sonar.token="$SONAR_TOKEN" \
+          /d:sonar.coverageReportPaths="coverage-report/SonarQube.xml" \
+          /d:sonar.qualitygate.wait=true \
+          /d:sonar.qualitygate.timeout=300
+
+    - name: Build the project
+      run: dotnet build
+
+    - name: Run unit tests
+      run: |
+        dotnet test \
+          --results-directory TestResults \
+          /p:CollectCoverage=true \
+          /p:CoverletOutputFormat=cobertura \
+          /p:CoverletOutput=TestResults/coverage/
+
+    - name: Generate report
+      run: |
+        reportgenerator \
+          -reports:TestResults/**/coverage.cobertura.xml \
+          -targetdir:coverage-report \
+          -reporttypes:SonarQube
+
+    - name: Complete Static Code Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        dotnet sonarscanner end \
+          /d:sonar.token="$SONAR_TOKEN"
