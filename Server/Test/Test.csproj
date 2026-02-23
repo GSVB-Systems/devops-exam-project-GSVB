@@ -6,7 +6,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>Test</RootNamespace>
     <TargetFramework>net10.0</TargetFramework>
-    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +20,7 @@
     <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="Testcontainers.PostgreSql" Version="4.8.1" />
-    <PackageReference Include="xunit.v3.mtp-v2" Version="3.2.2" />
+    <PackageReference Include="xunit.v3" Version="3.0.1.0" />
     <PackageReference Include="Xunit.DependencyInjection" Version="10.7.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
     <PackageReference Include="coverlet.msbuild" Version="6.0.0" PrivateAssets="all" />

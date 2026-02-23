@@ -13,6 +13,7 @@
 **/obj/
 bin/
 obj/
+coverage-report/
 
 # IDE folders
 **/.idea/
