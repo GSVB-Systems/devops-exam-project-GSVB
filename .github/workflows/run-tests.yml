@@ -34,4 +34,4 @@ jobs:
         env:
           DOTNET_ENVIRONMENT: Development
           JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
-        run: dotnet test --project Server/Test/Test.csproj --configuration Release --no-build
+        run: dotnet test ./Server/Test/Test.csproj --project Server/Test/Test.csproj --configuration Release --no-build

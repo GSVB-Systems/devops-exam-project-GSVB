@@ -34,7 +34,7 @@ jobs:
       run: dotnet build
 
     - name: Run unit tests
-      run: dotnet test --logger "console;verbosity=detailed" --logger "trx" --collect:"XPlat Code Coverage" --results-directory TestResults
+      run: dotnet test ./Server/Test/Test.csproj --collect:"XPlat Code Coverage" --results-directory TestResults
 
     - name: Generate report
       run: |
@@ -49,12 +49,3 @@ jobs:
       run: |
         dotnet sonarscanner end \
           /d:sonar.token="$SONAR_TOKEN"
-        
-        
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: |
-          **/TestResults/**
