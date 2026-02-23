@@ -17,6 +17,10 @@ jobs:
         dotnet tool install -g dotnet-reportgenerator-globaltool
 
     - name: Start Static Code Analysis
+      env:
+        SONAR_HOST: ${{ secrets.SONAR_HOST }}
+        SONAR_KEY: ${{ secrets.SONAR_KEY }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         dotnet sonarscanner begin \
           /k:"$SONAR_KEY" \
@@ -40,6 +44,8 @@ jobs:
           -reporttypes:SonarQube
 
     - name: Complete Static Code Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         dotnet sonarscanner end \
           /d:sonar.token=${{ vars.SONAR_TOKEN }}
