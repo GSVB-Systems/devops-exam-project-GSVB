@@ -36,6 +36,9 @@ jobs:
 
     - name: Run unit tests
       working-directory: Server/Test
+      env:
+        DOTNET_ENVIRONMENT: Development
+        JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
       run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
 
     - name: Generate report
