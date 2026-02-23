@@ -21,7 +21,6 @@ jobs:
         SONAR_HOST: ${{ secrets.SONAR_HOST }}
         SONAR_KEY: ${{ secrets.SONAR_KEY }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
       run: |
         dotnet sonarscanner begin \
           /k:"$SONAR_KEY" \
@@ -35,6 +34,8 @@ jobs:
       run: dotnet build
 
     - name: Run unit tests
+      env:
+        JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
       run: |
         dotnet test \
           --results-directory TestResults \
@@ -52,7 +53,6 @@ jobs:
     - name: Complete Static Code Analysis
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
       run: |
         dotnet sonarscanner end \
           /d:sonar.token="$SONAR_TOKEN"
