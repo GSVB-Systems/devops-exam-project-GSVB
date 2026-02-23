@@ -1,7 +1,7 @@
 ﻿name: Install required tools
-run: |
-  dotnet tool install -g dotnet-sonarscanner
-  dotnet tool install -g dotnet-reportgenerator-globaltool
+  run: |
+    dotnet tool install -g dotnet-sonarscanner
+    dotnet tool install -g dotnet-reportgenerator-globaltool
 
 - name: Start Static Code Analysis
   run: |
