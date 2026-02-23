@@ -49,7 +49,6 @@ jobs:
           -reporttypes:SonarQube
 
     - name: Complete Static Code Analysis
-      working-directory: Server/Test
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
