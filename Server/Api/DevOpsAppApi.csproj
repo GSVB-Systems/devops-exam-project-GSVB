@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Repository\DevOpsAppRepo.csproj" />
-    <ProjectReference Include="..\..\Service\DevOpsAppService.csproj" />
-    <ProjectReference Include="..\..\Contracts\DevOpsAppContracts.csproj" />
+    <ProjectReference Include="..\Repository\DevOpsAppRepo.csproj" />
+    <ProjectReference Include="..\Service\DevOpsAppService.csproj" />
+    <ProjectReference Include="..\Contracts\DevOpsAppContracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
