@@ -31,7 +31,8 @@ jobs:
           /d:sonar.qualitygate.timeout=300
 
     - name: Build the project
-      run: dotnet build
+      working-directory: /Server/Api/DevOpsAppApi
+      run: dotnet build 
 
     - name: Run unit tests
       working-directory: Server/Test
