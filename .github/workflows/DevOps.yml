@@ -26,7 +26,7 @@
     -targetdir:coverage-report \
     -reporttypes:SonarQube
 
--name: Complete Static Code Analaysis
+- name: Complete Static Code Analaysis
  run: |
     dotnet sonarscanner end 
       /d:sonar.token="$SONAR_TOKEN"
