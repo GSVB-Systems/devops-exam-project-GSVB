@@ -38,15 +38,15 @@ jobs:
         JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
       run: |
         dotnet test \
-          --results-directory TestResults \
+          --results-directory "${{ github.workspace }}/TestResults" \
           /p:CollectCoverage=true \
           /p:CoverletOutputFormat=cobertura \
-          /p:CoverletOutput=TestResults/coverage/
+          /p:CoverletOutput="${{ github.workspace }}/TestResults/coverage/"
 
     - name: Generate report
       run: |
         reportgenerator \
-          -reports:TestResults/**/coverage.cobertura.xml \
+          -reports:"${{ github.workspace }}/TestResults/**/coverage.cobertura.xml" \
           -targetdir:coverage-report \
           -reporttypes:SonarQube
 
