@@ -20,8 +20,8 @@ jobs:
       run: |
         dotnet sonarscanner begin \
           /k:"$SONAR_KEY" \
-          /d:sonar.host.url="$SONAR_HOST" \
-          /d:sonar.token="$SONAR_TOKEN" \
+          /d:sonar.host.url=${{ vars.SONAR_HOST }} \
+          /d:sonar.token=${{ vars.SONAR_TOKEN }} \
           /d:sonar.coverageReportPaths="coverage-report/SonarQube.xml" \
           /d:sonar.qualitygate.wait=true \
           /d:sonar.qualitygate.timeout=300
@@ -42,4 +42,4 @@ jobs:
     - name: Complete Static Code Analysis
       run: |
         dotnet sonarscanner end \
-          /d:sonar.token="$SONAR_TOKEN"
+          /d:sonar.token=${{ vars.SONAR_TOKEN }}
