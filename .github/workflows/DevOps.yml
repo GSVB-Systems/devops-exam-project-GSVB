@@ -27,6 +27,6 @@
     -reporttypes:SonarQube
 
 - name: Complete Static Code Analaysis
- run: |
+  run: |
     dotnet sonarscanner end 
       /d:sonar.token="$SONAR_TOKEN"
