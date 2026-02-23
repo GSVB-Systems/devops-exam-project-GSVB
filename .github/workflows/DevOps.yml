@@ -34,22 +34,7 @@ jobs:
       run: dotnet build
 
     - name: Run unit tests
-      run: dotnet test ./Server/Test/Test.csproj --collect:"XPlat Code Coverage" --results-directory TestResults
-      
-    - name: Run unit tests (trx + detailed console)
-      run: |
-        dotnet test Server/Test/Test.csproj \
-          -c Release \
-          --logger "console;verbosity=detailed" \
-          --logger "trx;LogFileName=test-results.trx" \
-          --results-directory ./artifacts/testresults
-        
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-      name: test-results
-      path: artifacts/testresults/**
+      run: dotnet test /Server/Test/Test.csproj --collect:"XPlat Code Coverage" --results-directory TestResults
 
     - name: Generate report
       run: |
