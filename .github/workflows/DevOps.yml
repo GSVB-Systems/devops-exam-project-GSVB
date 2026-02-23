@@ -40,7 +40,7 @@ jobs:
     - name: Generate report
       run: |
         reportgenerator \
-          -reports:TestResults/**/coverage.cobertura.xml \
+          -reports:Server/Test/TestResults/**/coverage.cobertura.xml \
           -targetdir:coverage-report \
           -reporttypes:SonarQube
 
