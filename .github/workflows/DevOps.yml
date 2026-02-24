@@ -46,7 +46,7 @@ jobs:
       working-directory: Server/
       run: |
         reportgenerator \
-          -reports:Server/TestResults/**/coverage.cobertura.xml \
+          -reports:TestResults/**/coverage.cobertura.xml \
           -targetdir:coverage-report \
           -reporttypes:SonarQube && echo $PWD && ls -A
 
