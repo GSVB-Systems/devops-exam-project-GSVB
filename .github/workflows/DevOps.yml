@@ -50,6 +50,12 @@ jobs:
           -targetdir:coverage-report \
           -reporttypes:SonarQube && echo $PWD && ls -A
 
+    - name: make commit
+      run: |
+       git add .
+       git commit -m "generate pack json file."
+       git push
+
     - name: Complete Static Code Analysis
       working-directory: Server/
       env:
