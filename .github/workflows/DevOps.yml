@@ -40,14 +40,15 @@ jobs:
       env:
         DOTNET_ENVIRONMENT: Development
         JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
-      run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
+      run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults && echo $PWD && ls -A
 
     - name: Generate report
+      working-directory: Server/
       run: |
         reportgenerator \
           -reports:Server/TestResults/**/coverage.cobertura.xml \
           -targetdir:coverage-report \
-          -reporttypes:SonarQube
+          -reporttypes:SonarQube && echo $PWD && ls -A
 
     - name: Complete Static Code Analysis
       working-directory: Server/
