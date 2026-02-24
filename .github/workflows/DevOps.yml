@@ -35,7 +35,7 @@ jobs:
       run: dotnet build 
 
     - name: Run unit tests
-      working-directory: Server/Test
+      working-directory: Server/
       env:
         DOTNET_ENVIRONMENT: Development
         JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
@@ -44,12 +44,12 @@ jobs:
     - name: Generate report
       run: |
         reportgenerator \
-          -reports:Server/Test/TestResults/**/coverage.cobertura.xml \
+          -reports:Server/TestResults/**/coverage.cobertura.xml \
           -targetdir:coverage-report \
           -reporttypes:SonarQube
 
     - name: Complete Static Code Analysis
-      working-directory: Server/Test
+      working-directory: Server/
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
