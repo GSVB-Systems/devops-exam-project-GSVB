@@ -3,6 +3,7 @@ using DevOpsAppRepo;
 using DevOpsAppRepo.Entities;
 using DevOpsAppService.Interfaces;
 using DevOpsAppService.Services;
+using service.Exceptions;
 using Ei;
 
 namespace Test;
@@ -108,28 +109,28 @@ public class EggSnapshotTests(
     }
 
     [Fact]
-    public async Task FetchAndSaveAsync_ReturnsNull_WhenUserMissing()
+    public async Task FetchAndSaveAsync_Throws_WhenUserMissing()
     {
         var ct = TestContext.Current.CancellationToken;
         fakeEggApiClient.Reset(BuildResponse("ei-999", boostsUsed: 1));
 
-        var result = await snapshotService.FetchAndSaveAsync("missing-user", "ei-999", ct);
+        await Assert.ThrowsAsync<ResourceNotFoundException>(
+            () => snapshotService.FetchAndSaveAsync("missing-user", "ei-999", ct));
 
-        Assert.Null(result);
         Assert.Equal(0, fakeEggApiClient.CallCount);
         Assert.Empty(ctx.UserEggSnapshots);
     }
 
     [Fact]
-    public async Task FetchAndSaveAsync_ReturnsNull_WhenEiUserIdMissing()
+    public async Task FetchAndSaveAsync_Throws_WhenEiUserIdMissing()
     {
         var ct = TestContext.Current.CancellationToken;
         var userId = await CreateUserAsync("sara");
         fakeEggApiClient.Reset(BuildResponse("ei-ignored", boostsUsed: 1));
 
-        var result = await snapshotService.FetchAndSaveAsync(userId, " ", ct);
+        await Assert.ThrowsAsync<InvalidRequestException>(
+            () => snapshotService.FetchAndSaveAsync(userId, " ", ct));
 
-        Assert.Null(result);
         Assert.Equal(0, fakeEggApiClient.CallCount);
         Assert.Empty(ctx.UserEggSnapshots);
     }

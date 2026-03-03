@@ -6,6 +6,8 @@ using DevOpsAppRepo.Repos;
 using DevOpsAppService.Auth;
 using DevOpsAppService.EggApi;
 using DevOpsAppService.Interfaces;
+using DevOpsAppService.Rules;
+using DevOpsAppService.Rules.Interfaces;
 using DevOpsAppService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -86,6 +88,9 @@ public static class ServiceCollectionExtensions
         services.AddControllers();
         services.AddOpenApiDocument();
         services.AddScoped<IUserEggSnapshotRepository, UserEggSnapshotRepository>();
+        services.AddScoped<IUserRules, UserRules>();
+        services.AddScoped<IEggAccountRules, EggAccountRules>();
+        services.AddScoped<IEggSnapshotRules, EggSnapshotRules>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEggAccountService, EggAccountService>();
         services.AddScoped<IEggSnapshotService, EggSnapshotService>();

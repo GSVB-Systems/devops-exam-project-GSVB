@@ -2,6 +2,7 @@ using DevOpsAppContracts.Models;
 using DevOpsAppRepo.Entities;
 using DevOpsAppRepo.Interfaces;
 using DevOpsAppService.Interfaces;
+using DevOpsAppService.Rules.Interfaces;
 using Google.Protobuf;
 using System.Linq;
 
@@ -11,17 +12,17 @@ public class EggSnapshotService : IEggSnapshotService
 {
     private static readonly TimeSpan MinFetchInterval = TimeSpan.FromMinutes(5);
     private readonly IEggApiClient _eggApiClient;
-    private readonly IUserRepository _userRepository;
     private readonly IUserEggSnapshotRepository _snapshotRepository;
+    private readonly IEggSnapshotRules _eggSnapshotRules;
 
     public EggSnapshotService(
         IEggApiClient eggApiClient,
-        IUserRepository userRepository,
-        IUserEggSnapshotRepository snapshotRepository)
+        IUserEggSnapshotRepository snapshotRepository,
+        IEggSnapshotRules eggSnapshotRules)
     {
         _eggApiClient = eggApiClient;
-        _userRepository = userRepository;
         _snapshotRepository = snapshotRepository;
+        _eggSnapshotRules = eggSnapshotRules;
     }
 
     public async Task<EggAccountRefreshDto?> FetchAndSaveAsync(
@@ -29,14 +30,7 @@ public class EggSnapshotService : IEggSnapshotService
         string eiUserId,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(userId))
-            return null;
-        if (string.IsNullOrWhiteSpace(eiUserId))
-            return null;
-
-        var user = await _userRepository.GetByIdAsync(userId);
-        if (user is null)
-            return null;
+        await _eggSnapshotRules.ValidateFetchAndSaveAsync(userId, eiUserId, cancellationToken);
 
         var existing = await _snapshotRepository.GetByUserAndEiUserIdAsync(userId, eiUserId);
         var now = DateTime.UtcNow;

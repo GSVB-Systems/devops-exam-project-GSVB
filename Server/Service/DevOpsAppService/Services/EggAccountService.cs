@@ -2,6 +2,7 @@ using DevOpsAppContracts.Models;
 using DevOpsAppRepo.Entities;
 using DevOpsAppRepo.Interfaces;
 using DevOpsAppService.Interfaces;
+using DevOpsAppService.Rules.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevOpsAppService.Services;
@@ -9,14 +10,18 @@ namespace DevOpsAppService.Services;
 public class EggAccountService : IEggAccountService
 {
     private readonly IUserEggSnapshotRepository _snapshotRepository;
+    private readonly IEggAccountRules _eggAccountRules;
 
-    public EggAccountService(IUserEggSnapshotRepository snapshotRepository)
+    public EggAccountService(IUserEggSnapshotRepository snapshotRepository, IEggAccountRules eggAccountRules)
     {
         _snapshotRepository = snapshotRepository;
+        _eggAccountRules = eggAccountRules;
     }
 
     public async Task<IReadOnlyList<EggAccountDto>> GetForUserAsync(string userId)
     {
+        await _eggAccountRules.ValidateGetForUserAsync(userId);
+
         if (string.IsNullOrWhiteSpace(userId))
             return Array.Empty<EggAccountDto>();
 
@@ -26,11 +31,7 @@ public class EggAccountService : IEggAccountService
 
     public async Task<EggAccountDto?> CreateAsync(string userId, CreateEggAccountDto dto)
     {
-        if (string.IsNullOrWhiteSpace(userId))
-            return null;
-        if (dto is null) throw new ArgumentNullException(nameof(dto));
-        if (string.IsNullOrWhiteSpace(dto.EiUserId))
-            throw new ArgumentException("EiUserId is required.", nameof(dto));
+        await _eggAccountRules.ValidateCreateAsync(userId, dto);
 
         var normalizedStatus = NormalizeStatus(dto.Status) ?? "Alt";
         var existing = await _snapshotRepository.GetByUserAndEiUserIdAsync(userId, dto.EiUserId);
@@ -73,9 +74,7 @@ public class EggAccountService : IEggAccountService
 
     public async Task<EggAccountDto?> UpdateAsync(string userId, string id, UpdateEggAccountDto dto)
     {
-        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(id))
-            return null;
-        if (dto is null) throw new ArgumentNullException(nameof(dto));
+        await _eggAccountRules.ValidateUpdateAsync(userId, id, dto);
 
         var existing = await _snapshotRepository.GetByIdAsync(id);
         if (existing is null || existing.UserId != userId)
@@ -99,8 +98,7 @@ public class EggAccountService : IEggAccountService
 
     public async Task<bool> DeleteAsync(string userId, string id)
     {
-        if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(id))
-            return false;
+        await _eggAccountRules.ValidateDeleteAsync(userId, id);
 
         var existing = await _snapshotRepository.GetByIdAsync(id);
         if (existing is null || existing.UserId != userId)

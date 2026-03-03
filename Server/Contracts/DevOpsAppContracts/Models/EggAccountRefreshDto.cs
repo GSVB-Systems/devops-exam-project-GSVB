@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace DevOpsAppContracts.Models;
 
 public class EggAccountRefreshDto
@@ -10,7 +12,10 @@ public class EggAccountRefreshDto
     public double? Mer { get; set; }
     public double? Jer { get; set; }
     public double? Eb { get; set; }
+    [Required]
     public DateTime LastFetchedUtc { get; set; }
+    [Required]
     public DateTime NextAllowedFetchUtc { get; set; }
+    [Required]
     public bool WasFetched { get; set; }
 }
