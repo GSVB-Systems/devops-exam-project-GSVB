@@ -3,10 +3,11 @@
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'devopsclient'
+app = 'DevOpsAppApi'
 primary_region = 'arn'
 
 [build]
+  dockerfile = "Dockerfile"
 
 [http_service]
   internal_port = 8080
