@@ -68,6 +68,20 @@ const RegisterPage = () => {
         </div>
         
         <div>
+          <label htmlFor="registerDiscordUsername" className="field-label">
+            Discord Username (optional)
+          </label>
+          <input
+            id="registerDiscordUsername"
+            type="text"
+            value={discordUsername}
+            onChange={(event) => setDiscordUsername(event.target.value)}
+            className="input input-bordered w-full shell-input"
+            placeholder="Your Discord username"
+          />
+        </div>
+
+        <div>
           <label htmlFor="registerEmail" className="field-label">
             Email
           </label>

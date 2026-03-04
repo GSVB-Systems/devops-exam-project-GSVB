@@ -23,7 +23,7 @@ builder.Services.AddApiServices(builder.Configuration);
 
 var app = builder.Build();
 
-app.GenerateApiClientsFromOpenApi("/../../../DevOpsClient/src/api/ServerApi.ts").GetAwaiter().GetResult();
+//app.GenerateApiClientsFromOpenApi("/../../../DevOpsClient/src/api/ServerApi.ts").GetAwaiter().GetResult();
 
 
 app.UseOpenApi();
