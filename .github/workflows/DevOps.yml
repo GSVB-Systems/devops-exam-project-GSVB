@@ -1,9 +1,9 @@
-﻿name: DevOps Pipeline
+﻿﻿name: DevOps Pipeline
 on:
   push:
-    branches: [ main ]
+    branches: [ main, Dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, Dev ]
 
 jobs:
   build:
@@ -31,21 +31,18 @@ jobs:
           /d:sonar.qualitygate.timeout=300
 
     - name: Build the project
-      run: dotnet build 
+      run: dotnet build
 
     - name: Run unit tests
-      working-directory: Server/Test
       env:
-        DOTNET_ENVIRONMENT: Development
         JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
-      run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
+      run: |
+        dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
 
     - name: Generate report
       run: |
-        reportgenerator \
-          -reports:Server/Test/TestResults/**/coverage.cobertura.xml \
-          -targetdir:coverage-report \
-          -reporttypes:SonarQube
+        dotnet tool restore
+        dotnet reportgenerator -reports:TestResults/**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:SonarQube
 
     - name: Complete Static Code Analysis
       env:
