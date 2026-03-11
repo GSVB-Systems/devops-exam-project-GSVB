@@ -1,9 +1,9 @@
 ﻿name: DevOps Pipeline
 on:
   push:
-    branches: [ main, folderTest ]
+    branches: [ main, Dev, folderTest ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, Dev, folderTest ]
 
 jobs:
   build:
@@ -17,7 +17,6 @@ jobs:
         dotnet tool install -g dotnet-reportgenerator-globaltool
 
     - name: Start Static Code Analysis
-      working-directory: Server/
       env:
         SONAR_HOST: ${{ secrets.SONAR_HOST }}
         SONAR_KEY: ${{ secrets.SONAR_KEY }}
@@ -32,26 +31,20 @@ jobs:
           /d:sonar.qualitygate.timeout=300
 
     - name: Build the project
-      working-directory: Server/
-      run: dotnet build 
+      run: dotnet build
 
     - name: Run unit tests
-      working-directory: Server/
       env:
-        DOTNET_ENVIRONMENT: Development
         JWT__SECRET: temp-ci-secret-32-bytes-temp-ci-secret
-      run: dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults && echo $PWD && ls -A
+      run: |
+        dotnet test --collect:"XPlat Code Coverage" --results-directory TestResults
 
     - name: Generate report
-      working-directory: Server/
       run: |
-        reportgenerator \
-          -reports:TestResults/**/coverage.cobertura.xml \
-          -targetdir:coverage-report \
-          -reporttypes:SonarQube && echo $PWD && ls -A
+        dotnet tool restore
+        dotnet reportgenerator -reports:TestResults/**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:SonarQube
 
     - name: Complete Static Code Analysis
-      working-directory: Server/
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
