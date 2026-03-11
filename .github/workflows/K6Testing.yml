@@ -1,15 +1,13 @@
 ﻿name: k6 Load Test
 
 on:
-  workflow_run:
-    workflows: ["Fly DeployServer", "Fly DeployClient"]
-    types: [completed]
-    branches: [main, Dev]
+  push:
+    branches:
+      - Dev
 
 jobs:
   run-testClient:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,13 +18,9 @@ jobs:
         uses: grafana/run-k6-action@v1
         with:
           path: ./DevOpsClient/src/k6TestingClient.js
-        env:
-          K6LOGINTEST_EMAIL: ${{ secrets.K6LOGINTEST_EMAIL }}
-          K6LOGINTEST_PASSWORD: ${{ secrets.K6LOGINTEST_PASSWORD }}
           
   run-testServer:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,6 +31,3 @@ jobs:
         uses: grafana/run-k6-action@v1
         with:
           path: ./Server/Api/DevOpsAppApi/k6Testing.js
-        env:
-          K6LOGINTEST_EMAIL: ${{ secrets.K6LOGINTEST_EMAIL }}
-          K6LOGINTEST_PASSWORD: ${{ secrets.K6LOGINTEST_PASSWORD }}

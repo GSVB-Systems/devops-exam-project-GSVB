@@ -1,15 +1,17 @@
 ﻿name: Fly DeployServer
 on:
-  workflow_run:
-    workflows: ["DevOps Pipeline"]
-    types: [completed]
-    branches: [main, Dev]
+  push:
+    branches:
+      - main
+      - Dev
+  pull_request:
+    branches:
+      - main
+      - Dev    # change to main if needed
 jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
