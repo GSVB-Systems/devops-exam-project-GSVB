@@ -21,12 +21,6 @@ jobs:
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKENCLIENT }}
           
-  run-testClient:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Setup K6
         uses: grafana/setup-k6-action@v1
       - name: Run local k6 test
