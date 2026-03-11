@@ -9,8 +9,8 @@ export const options = {
 };
 
 const credentials = {
-    email: __ENV.EMAIL,
-    password: __ENV.PASSWORD,
+    email: __ENV.K6LOGINTEST_EMAIL,
+    password: __ENV.K6LOGINTEST_PASSWORD,
 };
 
 
