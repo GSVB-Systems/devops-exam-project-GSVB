@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <RootNamespace>Test</RootNamespace>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

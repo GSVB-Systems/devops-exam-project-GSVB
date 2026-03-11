@@ -1,5 +1,5 @@
 # 1. Create a stage for building the application.
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 # 2. Copy everything in current directory (server/) into /source on build container
 COPY . /source
 # 3. Change container working directory to /source
@@ -10,7 +10,7 @@ RUN dotnet publish ./Api/DevOpsAppApi.csproj --configuration Release --no-self-c
 
 # 5. Create a new stage for running the application with minimal runtime
 # dependencies.
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 # 6. Change container working directory to /app
 WORKDIR /app
 # 7. Copy everything needed to run the app from the "build" stage.
