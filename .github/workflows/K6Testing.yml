@@ -18,6 +18,9 @@ jobs:
         uses: grafana/run-k6-action@v1
         with:
           path: ./DevOpsClient/src/k6TestingClient.js
+        env:
+          K6LOGINTEST_EMAIL: ${{ secrets.K6LOGINTEST_EMAIL }}
+          K6LOGINTEST_PASSWORD: ${{ secrets.K6LOGINTEST_PASSWORD }}
           
   run-testServer:
     runs-on: ubuntu-latest
@@ -31,3 +34,6 @@ jobs:
         uses: grafana/run-k6-action@v1
         with:
           path: ./Server/Api/DevOpsAppApi/k6Testing.js
+        env:
+          K6LOGINTEST_EMAIL: ${{ secrets.K6LOGINTEST_EMAIL }}
+          K6LOGINTEST_PASSWORD: ${{ secrets.K6LOGINTEST_PASSWORD }}
