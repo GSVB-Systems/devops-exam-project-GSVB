@@ -3,6 +3,7 @@
     <Project Path="Server/Test/Test.csproj" />
   </Folder>
   <Folder Name="/Server/Api/">
+    <File Path="Server/Api/k6Testing.js" />
     <Project Path="Server/Api/DevOpsAppApi/DevOpsAppApi.csproj" />
   </Folder>
   <Folder Name="/Server/Contracts/">
