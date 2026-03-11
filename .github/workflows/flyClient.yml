@@ -19,3 +19,13 @@ jobs:
         working-directory: DevOpsClient/
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKENCLIENT }}
+
+      - name: Setup K6
+        uses: grafana/setup-k6-action@v1
+      - name: Run local k6 test
+        uses: grafana/run-k6-action@v1
+        with:
+          path: ./DevOpsClient/src/k6TestingClient.js
+        env:
+          K6LOGINTEST_EMAIL: ${{ secrets.K6LOGINTEST_EMAIL }}
+          K6LOGINTEST_PASSWORD: ${{ secrets.K6LOGINTEST_PASSWORD }}
