@@ -606,3 +606,4 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 # End of https://www.toptal.com/developers/gitignore/api/rider,csharp,webstorm
+*.md
