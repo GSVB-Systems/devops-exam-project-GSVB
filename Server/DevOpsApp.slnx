@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Server/">
+    <Project Path="Test/Test.csproj" />
+  </Folder>
+  <Folder Name="/Server/Api/">
+    <Project Path="Api/DevOpsAppApi.csproj" />
+  </Folder>
+  <Folder Name="/Server/Contracts/">
+    <Project Path="Contracts/DevOpsAppContracts.csproj" />
+  </Folder>
+  <Folder Name="/Server/Repository/">
+    <Project Path="Repository/DevOpsAppRepo.csproj" />
+  </Folder>
+  <Folder Name="/Server/Service/">
+    <Project Path="Service/DevOpsAppService.csproj" />
+  </Folder>
+</Solution>

@@ -24,11 +24,9 @@ public class UserServiceTests(IUserService userService, DevOpsAppDbContext ctx)
         var user = UserTestData.CreateUser();
         var CreatedUser = await userService.CreateAsync(user);
 
-        var updateDto = UserTestData.UpdateUserFaker
-            .Clone()
-            .RuleFor(x => x.Email, _ => user.Email)
-            .RuleFor(x => x.Username, _ => user.Username)
-            .Generate();
+        var updateDto = UserTestData.UpdateUser(seed: 210);
+        updateDto.Email = user.Email;
+        updateDto.Username = user.Username;
 
         var updatedUser = await userService.UpdateAsync(CreatedUser.UserId,updateDto);
 
@@ -55,11 +53,9 @@ public class UserServiceTests(IUserService userService, DevOpsAppDbContext ctx)
         var user = UserTestData.CreateUser();
         await userService.CreateAsync(user);
 
-        var loginRequest = UserTestData.LoginRequestFaker
-            .Clone()
-            .RuleFor(x => x.Email, _ => user.Email)
-            .RuleFor(x => x.Password, _ => user.Password)
-            .Generate();
+        var loginRequest = UserTestData.LoginRequest(seed: 220);
+        loginRequest.Email = user.Email;
+        loginRequest.Password = user.Password;
 
         var auth = await userService.LoginAsync(loginRequest);
 
@@ -73,11 +69,9 @@ public class UserServiceTests(IUserService userService, DevOpsAppDbContext ctx)
         var user = UserTestData.CreateUser();
         await userService.CreateAsync(user);
 
-        var loginRequest = UserTestData.LoginRequestFaker
-            .Clone()
-            .RuleFor(x => x.Email, _ => user.Email)
-            .RuleFor(x => x.Password, _ => "WrongPassword123!")
-            .Generate();
+        var loginRequest = UserTestData.LoginRequest(seed: 221);
+        loginRequest.Email = user.Email;
+        loginRequest.Password = "WrongPassword123!";
 
         var auth = await userService.LoginAsync(loginRequest);
 
@@ -90,11 +84,9 @@ public class UserServiceTests(IUserService userService, DevOpsAppDbContext ctx)
         var user = UserTestData.CreateUser();
         await userService.CreateAsync(user);
 
-        var loginRequest = UserTestData.LoginRequestFaker
-            .Clone()
-            .RuleFor(x => x.Email, _ => user.Email)
-            .RuleFor(x => x.Password, _ => " ")
-            .Generate();
+        var loginRequest = UserTestData.LoginRequest(seed: 222);
+        loginRequest.Email = user.Email;
+        loginRequest.Password = " ";
 
         var auth = await userService.LoginAsync(loginRequest);
 

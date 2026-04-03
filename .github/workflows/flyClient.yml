@@ -4,12 +4,12 @@ on:
     branches:
       - main
       - Dev
-      - folderTest
+      - Dev2
   pull_request:
     branches:
       - main
       - Dev    # change to main if needed
-      - folderTest
+      - Dev2
 jobs:
   deploy:
     name: Deploy app
@@ -28,3 +28,6 @@ jobs:
         uses: grafana/run-k6-action@v1
         with:
           path: ./Client/src/K6TestingClient.js
+        env:
+          K6LOGINTEST_EMAIL: ${{ secrets.K6LOGINTEST_EMAIL }}
+          K6LOGINTEST_PASSWORD: ${{ secrets.K6LOGINTEST_PASSWORD }}
