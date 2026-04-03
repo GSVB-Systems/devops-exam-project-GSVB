@@ -13,8 +13,9 @@ jobs:
     
     - name: Install required tools
       run: |
-        dotnet tool install -g dotnet-sonarscanner
-        dotnet tool install -g dotnet-reportgenerator-globaltool
+        dotnet new tool-manifest || true
+        dotnet tool install dotnet-sonarscanner
+        dotnet tool install dotnet-reportgenerator-globaltool
 
     - name: Start Static Code Analysis
       continue-on-error: true
@@ -45,7 +46,7 @@ jobs:
     - name: Generate report
       run: |
         dotnet tool restore
-        dotnet reportgenerator -reports:TestResults/**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:SonarQube
+        dotnet tool run reportgenerator -reports:TestResults/**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:SonarQube
 
     - name: Complete Static Code Analysis
       if: always()
