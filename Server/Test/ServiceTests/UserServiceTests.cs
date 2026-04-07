@@ -6,6 +6,39 @@ namespace Test.ServiceTests;
 
 public class UserServiceTests(IUserService userService, DevOpsAppDbContext ctx)
 {
+    [Fact]
+    public async Task GetByIdAsync_ExistingUser_ReturnsUser()
+    {
+        var user = UserTestData.CreateUser(seed: 230);
+        var created = await userService.CreateAsync(user);
+
+        var found = await userService.GetByIdAsync(created.UserId);
+
+        Assert.NotNull(found);
+        Assert.Equal(created.UserId, found!.UserId);
+        Assert.Equal(user.Email, found.Email);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_WhitespaceId_ReturnsNull()
+    {
+        var found = await userService.GetByIdAsync(" ");
+
+        Assert.Null(found);
+    }
+
+    [Fact]
+    public async Task GetAllAsync_ReturnsCreatedUsers()
+    {
+        await userService.CreateAsync(UserTestData.CreateUser(seed: 231));
+        await userService.CreateAsync(UserTestData.CreateUser(seed: 232));
+
+        var result = await userService.GetAllAsync(parameters: null);
+
+        Assert.True(result.TotalCount >= 2);
+        Assert.True(result.Items.Count >= 2);
+    }
+
     
     [Fact]
     public async Task CreateUserValid()
@@ -33,6 +66,16 @@ public class UserServiceTests(IUserService userService, DevOpsAppDbContext ctx)
         Assert.NotNull(updatedUser);
         Assert.Equal(updateDto.Username, updatedUser!.Username);
         Assert.Equal(updateDto.Email, updatedUser.Email);
+    }
+
+    [Fact]
+    public async Task UpdateUserMissing_ReturnsNull()
+    {
+        var updateDto = UserTestData.UpdateUser(seed: 233);
+
+        var updatedUser = await userService.UpdateAsync(Guid.NewGuid().ToString("N"), updateDto);
+
+        Assert.Null(updatedUser);
     }
     
     [Fact]

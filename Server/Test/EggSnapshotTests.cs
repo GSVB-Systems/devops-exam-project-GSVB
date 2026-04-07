@@ -3,7 +3,7 @@ using DevOpsAppRepo;
 using DevOpsAppRepo.Entities;
 using DevOpsAppService.Interfaces;
 using DevOpsAppService.Services;
-using Ei;
+using Test.Builders;
 
 namespace Test;
 
@@ -11,11 +11,23 @@ public class EggSnapshotTests(
     IEggSnapshotService snapshotService, IUserService userService, DevOpsAppDbContext ctx, FakeEggApiClient fakeEggApiClient)
 {
     [Fact]
+    public async Task FetchAndSaveAsync_ReturnsNull_WhenUserIdMissing()
+    {
+        var ct = TestContext.Current.CancellationToken;
+        fakeEggApiClient.Reset(EggSnapshotServiceTestData.FirstContactResponse("ei-unused", boostsUsed: 0, seed: 510));
+
+        var result = await snapshotService.FetchAndSaveAsync(" ", "ei-123", ct);
+
+        Assert.Null(result);
+        Assert.Equal(0, fakeEggApiClient.CallCount);
+    }
+
+    [Fact]
     public async Task FetchAndSaveAsync_CreatesSnapshotAndReturnsDto()
     {
         var ct = TestContext.Current.CancellationToken;
         var userId = await CreateUserAsync("lars");
-        var response = BuildResponse("ei-123", boostsUsed: 42);
+        var response = EggSnapshotServiceTestData.FirstContactResponse("ei-123", boostsUsed: 42, seed: 511);
         fakeEggApiClient.Reset(response);
 
         var result = await snapshotService.FetchAndSaveAsync(userId, "ei-123", ct);
@@ -23,23 +35,23 @@ public class EggSnapshotTests(
         Assert.NotNull(result);
         Assert.True(result!.WasFetched);
         Assert.Equal(result.LastFetchedUtc.AddMinutes(5), result.NextAllowedFetchUtc);
-        Assert.Equal("TestName", result.UserName);
-        Assert.Equal(1234D, result.SoulEggs);
-        Assert.Equal((ulong)7, result.EggsOfProphecy);
-        Assert.Equal((ulong)5, result.TruthEggs);
-        Assert.Equal(750, result.GoldenEggsBalance);
+        Assert.Equal(response.Backup.UserName, result.UserName);
+        Assert.Equal(response.Backup.Game.SoulEggsD, result.SoulEggs);
+        Assert.Equal(response.Backup.Game.EggsOfProphecy, result.EggsOfProphecy);
+        Assert.Equal((ulong)response.Backup.Virtue.EovEarned.Sum(x => (long)x), result.TruthEggs);
+        Assert.Equal((long)response.Backup.Game.GoldenEggsEarned - (long)response.Backup.Game.GoldenEggsSpent, result.GoldenEggsBalance);
 
         var snapshot = ctx.UserEggSnapshots.Single(s => s.UserId == userId);
         Assert.Equal("ei-123", snapshot.EiUserId);
-        Assert.Equal("TestName", snapshot.UserName);
+        Assert.Equal(response.Backup.UserName, snapshot.UserName);
         Assert.Equal((ulong)42, snapshot.BoostsUsed);
-        Assert.Equal(1234D, snapshot.SoulEggs);
-        Assert.Equal((ulong)7, snapshot.EggsOfProphecy);
-        Assert.Equal((ulong)5, snapshot.TruthEggs);
-        Assert.Equal((ulong)1000, snapshot.GoldenEggsEarned);
-        Assert.Equal((ulong)250, snapshot.GoldenEggsSpent);
-        Assert.Equal(750, snapshot.GoldenEggsBalance);
-        Assert.Equal(12.5D, snapshot.CraftingXp);
+        Assert.Equal(response.Backup.Game.SoulEggsD, snapshot.SoulEggs);
+        Assert.Equal(response.Backup.Game.EggsOfProphecy, snapshot.EggsOfProphecy);
+        Assert.Equal((ulong)response.Backup.Virtue.EovEarned.Sum(x => (long)x), snapshot.TruthEggs);
+        Assert.Equal(response.Backup.Game.GoldenEggsEarned, snapshot.GoldenEggsEarned);
+        Assert.Equal(response.Backup.Game.GoldenEggsSpent, snapshot.GoldenEggsSpent);
+        Assert.Equal((long)response.Backup.Game.GoldenEggsEarned - (long)response.Backup.Game.GoldenEggsSpent, snapshot.GoldenEggsBalance);
+        Assert.Equal(response.Backup.Artifacts.CraftingXp, snapshot.CraftingXp);
         Assert.False(string.IsNullOrWhiteSpace(snapshot.RawJson));
     }
 
@@ -82,7 +94,7 @@ public class EggSnapshotTests(
         await ctx.SaveChangesAsync(ct);
                 ctx.ChangeTracker.Clear();
 
-        fakeEggApiClient.Reset(BuildResponse("ei-new", boostsUsed: 99));
+        fakeEggApiClient.Reset(EggSnapshotServiceTestData.FirstContactResponse("ei-new", boostsUsed: 99, seed: 512));
 
         var result = await snapshotService.FetchAndSaveAsync(userId, "ei-previous", ct);
 
@@ -108,10 +120,51 @@ public class EggSnapshotTests(
     }
 
     [Fact]
+    public async Task FetchAndSaveAsync_WhenWithinMinInterval_RecalculatesAndPersistsMerJer()
+    {
+        var ct = TestContext.Current.CancellationToken;
+        var userId = await CreateUserAsync("mona");
+        fakeEggApiClient.Reset(EggSnapshotServiceTestData.FirstContactResponse("ei-unused", boostsUsed: 0, seed: 513));
+
+        ctx.UserEggSnapshots.Add(new UserEggSnapshot
+        {
+            Id = Guid.NewGuid().ToString(),
+            UserId = userId,
+            EiUserId = "ei-cache",
+            UserName = "CacheRecalc",
+            BoostsUsed = 1,
+            SoulEggs = 1_000_000_000_000_000_000D,
+            EggsOfProphecy = 1,
+            TruthEggs = 0,
+            GoldenEggsEarned = 20,
+            GoldenEggsSpent = 10,
+            GoldenEggsBalance = 10,
+            LastFetchedUtc = DateTime.UtcNow,
+            Mer = null,
+            Jer = null,
+            RawJson = "{}"
+        });
+        await ctx.SaveChangesAsync(ct);
+        ctx.ChangeTracker.Clear();
+
+        var result = await snapshotService.FetchAndSaveAsync(userId, "ei-cache", ct);
+
+        Assert.NotNull(result);
+        Assert.False(result!.WasFetched);
+        Assert.NotNull(result.Mer);
+        Assert.NotNull(result.Jer);
+        Assert.Equal(0, fakeEggApiClient.CallCount);
+
+        var snapshot = ctx.UserEggSnapshots.Single(s => s.UserId == userId && s.EiUserId == "ei-cache");
+        Assert.NotNull(snapshot.Mer);
+        Assert.NotNull(snapshot.Jer);
+    }
+
+    [Fact]
     public async Task FetchAndSaveAsync_ReturnsNull_WhenUserMissing()
     {
         var ct = TestContext.Current.CancellationToken;
-        fakeEggApiClient.Reset(BuildResponse("ei-999", boostsUsed: 1));
+        fakeEggApiClient.Reset(EggSnapshotServiceTestData.FirstContactResponse("ei-999", boostsUsed: 1, seed: 514));
 
         var result = await snapshotService.FetchAndSaveAsync("missing-user", "ei-999", ct);
 
@@ -125,13 +178,59 @@ public class EggSnapshotTests(
     {
         var ct = TestContext.Current.CancellationToken;
         var userId = await CreateUserAsync("sara");
-        fakeEggApiClient.Reset(BuildResponse("ei-ignored", boostsUsed: 1));
+        fakeEggApiClient.Reset(EggSnapshotServiceTestData.FirstContactResponse("ei-ignored", boostsUsed: 1, seed: 515));
 
         var result = await snapshotService.FetchAndSaveAsync(userId, " ", ct);
 
         Assert.Null(result);
         Assert.Equal(0, fakeEggApiClient.CallCount);
         Assert.Empty(ctx.UserEggSnapshots);
+    }
+
+    [Fact]
+    public async Task FetchAndSaveAsync_UsesBackupEiUserId_WhenResponseEiUserIdMissing()
+    {
+        var ct = TestContext.Current.CancellationToken;
+        var userId = await CreateUserAsync("zara");
+        fakeEggApiClient.Reset(EggSnapshotServiceTestData.FirstContactResponse("ei-backup", boostsUsed: 11, responseEiUserId: " ", seed: 516));
+
+        var result = await snapshotService.FetchAndSaveAsync(userId, "ei-request", ct);
+
+        Assert.NotNull(result);
+        Assert.True(result!.WasFetched);
+
+        var snapshot = ctx.UserEggSnapshots.Single(s => s.UserId == userId);
+        Assert.Equal("ei-backup", snapshot.EiUserId);
+    }
+
+    [Fact]
+    public async Task FetchAndSaveAsync_WhenExistingOutsideInterval_NormalizesStatusAndUpdatesEiUserId()
+    {
+        var ct = TestContext.Current.CancellationToken;
+        var userId = await CreateUserAsync("jon");
+        var existing = new UserEggSnapshot
+        {
+            Id = Guid.NewGuid().ToString(),
+            UserId = userId,
+            EiUserId = "ei-request",
+            Status = " ",
+            LastFetchedUtc = DateTime.UtcNow.AddMinutes(-10),
+            RawJson = "{}"
+        };
+        ctx.UserEggSnapshots.Add(existing);
+        await ctx.SaveChangesAsync(ct);
+        ctx.ChangeTracker.Clear();
+
+        fakeEggApiClient.Reset(EggSnapshotServiceTestData.FirstContactResponse("ei-backup-2", boostsUsed: 12, responseEiUserId: " ", seed: 517));
+
+        var result = await snapshotService.FetchAndSaveAsync(userId, "ei-request", ct);
+
+        Assert.NotNull(result);
+        Assert.True(result!.WasFetched);
+
+        var snapshot = ctx.UserEggSnapshots.Single(s => s.Id == existing.Id);
+        Assert.Equal("Alt", snapshot.Status);
+        Assert.Equal("ei-backup-2", snapshot.EiUserId);
     }
 
     private async Task<string> CreateUserAsync(string seed)
@@ -147,36 +246,5 @@ public class EggSnapshotTests(
         return created.UserId;
     }
 
-    private static EggIncFirstContactResponse BuildResponse(string eiUserId, ulong boostsUsed)
-    {
-        return new EggIncFirstContactResponse
-        {
-            EiUserId = eiUserId,
-            Backup = new Backup
-            {
-                EiUserId = eiUserId,
-                UserName = "TestName",
-                Stats = new Backup.Types.Stats
-                {
-                    BoostsUsed = boostsUsed
-                },
-                Game = new Backup.Types.Game
-                {
-                    SoulEggsD = 1234D,
-                    EggsOfProphecy = 7,
-                    GoldenEggsEarned = 1000,
-                    GoldenEggsSpent = 250,
-                    UncliamedGoldenEggs = 10
-                },
-                Virtue = new Backup.Types.Virtue
-                {
-                    EovEarned = { 5 }
-                },
-                Artifacts = new Backup.Types.Artifacts
-                {
-                    CraftingXp = 12.5D
-                }
-            }
-        };
-    }
+    // test response generation moved to Test.Builders.EggSnapshotServiceTestData
 }
