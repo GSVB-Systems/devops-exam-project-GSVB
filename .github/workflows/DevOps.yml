@@ -48,6 +48,48 @@ jobs:
         dotnet tool restore
         dotnet tool run reportgenerator -reports:TestResults/**/coverage.cobertura.xml -targetdir:coverage-report -reporttypes:SonarQube
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+        cache-dependency-path: Client/package-lock.json
+
+    - name: Install client dependencies
+      working-directory: Client
+      run: npm ci
+
+    - name: Build client
+      working-directory: Client
+      run: npm run build
+
+    - name: Start client preview
+      working-directory: Client
+      run: |
+        nohup npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/client-preview.log 2>&1 &
+        echo $! > /tmp/client-preview.pid
+        for _ in $(seq 1 30); do
+          if curl -fsS http://127.0.0.1:4173 >/dev/null; then
+            exit 0
+          fi
+          sleep 1
+        done
+        echo "Client preview server did not start in time"
+        exit 1
+
+    - name: Run e2e tests
+      working-directory: Client
+      env:
+        E2E_BASE_URL: http://127.0.0.1:4173
+      run: npx testcafe chrome:headless tests/test.js
+
+    - name: Stop client preview
+      if: always()
+      run: |
+        if [ -f /tmp/client-preview.pid ]; then
+          kill "$(cat /tmp/client-preview.pid)" || true
+        fi
+
     - name: Complete Static Code Analysis
       if: always()
       continue-on-error: true
