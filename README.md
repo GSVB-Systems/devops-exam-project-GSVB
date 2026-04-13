@@ -40,7 +40,7 @@ Database storing user data pseudonymously
 ### Week 9
 **Feature 1:** Leaderboard page part 1
 
-**Feature 2:** Account Level Calculation
+**Feature 2:** Account Level Calculation*
 
 ### Week 10
 **Feature 1:** Create User
@@ -55,7 +55,7 @@ Database storing user data pseudonymously
 ### Week 12
 **Feature 1:** EggApi Data Fetch final
 
-**Feature 2:** Themes
+**Feature 2:** Themes*
 
 ### Week 13
 **Feature 1:** Leaderboard page part 3
@@ -66,16 +66,7 @@ Database storing user data pseudonymously
 *Easter vacation - nothing planned.*
 
 ### Week 15
-**Feature 1:** Toggle feature
+**Feature 1:** Toggle feature*
 
-**Feature 2:** Toggle feature
+**Feature 2:** Toggle feature*
 
-### Week 16
-**Feature 1:** [...]
-
-**Feature 2:** [...]
-
-### Week 17
-**Feature 1:** [...]
-
-**Feature 2:** [...]
