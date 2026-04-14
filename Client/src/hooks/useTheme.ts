@@ -8,6 +8,7 @@ const isThemeName = (value: string | null): value is ThemeName => {
   return value === 'default' || value === 'alternate'
 }
 
+
 export const useTheme = () => {
   const [theme, setTheme] = useState<ThemeName>(() => {
     const storedTheme = localStorage.getItem(THEME_STORAGE_KEY)
