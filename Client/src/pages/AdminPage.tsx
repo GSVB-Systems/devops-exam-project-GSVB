@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { userApi, type UserProfile } from '../api/userApi'
 import { useAuthToken } from '../hooks/useAuthToken'
 import { getRoleFromJwt } from '../utils/jwt'
+import { featureFlags } from '../utils/featureFlags'
 
 const AdminPage = () => {
   const token = useAuthToken()
@@ -91,9 +92,11 @@ const AdminPage = () => {
               <h3 className="panel-title">Other areas</h3>
             </div>
             <div className="shell-actions">
-              <Link to="/leaderboards" className="btn btn-sm btn-outline">
-                Leaderboards
-              </Link>
+              {!featureFlags.leaderboards ? null : (
+                <Link to="/leaderboards" className="btn btn-sm btn-outline">
+                  Leaderboards
+                </Link>
+              )}
               <Link to="/settings" className="btn btn-sm btn-outline">
                 Account settings
               </Link>

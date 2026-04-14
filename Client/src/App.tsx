@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import ProtectedRoute from './components/ProtectedRoute.tsx'
 import AccountSettingsPage from './pages/AccountSettingsPage.tsx'
@@ -12,6 +12,7 @@ import AdminProtectedRoute from './components/AdminProtectedRoute.tsx'
 import UserListPage from './pages/UserListPage.tsx'
 import UserDetailPage from './pages/UserDetailPage.tsx'
 import { useTheme } from './hooks/useTheme.ts'
+import { featureFlags } from './utils/featureFlags.ts'
 
 function App() {
   const { theme, toggleTheme } = useTheme()
@@ -64,9 +65,13 @@ function App() {
           <Route
             path="/leaderboards"
             element={
-              <ProtectedRoute>
-                <LeaderboardsPage />
-              </ProtectedRoute>
+              featureFlags.leaderboards ? (
+                <ProtectedRoute>
+                  <LeaderboardsPage />
+                </ProtectedRoute>
+              ) : (
+                <Navigate to="/" replace />
+              )
             }
           />
           <Route
@@ -78,27 +83,39 @@ function App() {
                 }
           />
           <Route
-              path="/AdminPage"
-                element={
-                    <AdminProtectedRoute>
-                        <AdminPage />
-                    </AdminProtectedRoute>
-                }
+            path="/AdminPage"
+            element={
+              featureFlags.admin ? (
+                <AdminProtectedRoute>
+                  <AdminPage />
+                </AdminProtectedRoute>
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
           />
           <Route
             path="/admin/users"
             element={
-              <AdminProtectedRoute>
-                <UserListPage />
-              </AdminProtectedRoute>
+              featureFlags.admin ? (
+                <AdminProtectedRoute>
+                  <UserListPage />
+                </AdminProtectedRoute>
+              ) : (
+                <Navigate to="/" replace />
+              )
             }
           />
           <Route
             path="/admin/users/:userId"
             element={
-              <AdminProtectedRoute>
-                <UserDetailPage />
-              </AdminProtectedRoute>
+              featureFlags.admin ? (
+                <AdminProtectedRoute>
+                  <UserDetailPage />
+                </AdminProtectedRoute>
+              ) : (
+                <Navigate to="/" replace />
+              )
             }
           />
           <Route path="/login" element={<LoginPage />} />

@@ -1,9 +1,11 @@
 ﻿using DevOpsAppContracts.Models;
 using DevOpsAppService.Interfaces;
+using DevOpsAppApi;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
 
 namespace DevOpsAppApi.Controllers;
 
@@ -12,10 +14,12 @@ namespace DevOpsAppApi.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly FeatureFlagsOptions _featureFlags;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, IOptions<FeatureFlagsOptions> featureFlags)
     {
         _userService = userService;
+        _featureFlags = featureFlags.Value;
     }
 
     [Authorize]
@@ -46,6 +50,9 @@ public class UserController : ControllerBase
     [HttpGet("getAllUsers")]
     public async Task<ActionResult<PagedResult<UserDto>>> GetAll([FromQuery] SieveModel? parameters)
     {
+        if (!_featureFlags.Admin)
+            return NotFound();
+
         var users = await _userService.GetAllAsync(parameters);
         return Ok(users);
     }
@@ -54,6 +61,9 @@ public class UserController : ControllerBase
     [HttpGet("getUserById/{id}")]
     public async Task<ActionResult<UserDto>> GetById(string id)
     {
+        if (!_featureFlags.Admin)
+            return NotFound();
+
         var user = await _userService.GetByIdAsync(id);
         return user is null ? NotFound() : Ok(user);
     }
@@ -70,6 +80,9 @@ public class UserController : ControllerBase
     [HttpPut("updateUser/{id}")]
     public async Task<ActionResult<UserDto>> Update(string id, [FromBody] UpdateUserDto dto)
     {
+        if (!_featureFlags.Admin)
+            return NotFound();
+
         var updated = await _userService.UpdateAsync(id, dto);
         return updated is null ? NotFound() : Ok(updated);
     }
@@ -78,6 +91,9 @@ public class UserController : ControllerBase
     [HttpDelete("deleteUser/{id}")]
     public async Task<IActionResult> Delete(string id)
     {
+        if (!_featureFlags.Admin)
+            return NotFound();
+
         var deleted = await _userService.DeleteAsync(id);
         return deleted ? NoContent() : NotFound();
     }

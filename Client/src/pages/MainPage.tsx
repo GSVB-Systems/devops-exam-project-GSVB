@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { userApi, type EggAccount, type EggAccountRefresh, type UserProfile } from '../api/userApi'
+import { featureFlags } from '../utils/featureFlags'
 
 const MainPage = () => {
   const selectedAccountStorageKey = 'selectedEiUserId'
@@ -182,9 +183,11 @@ const MainPage = () => {
             <h3 className="panel-title">Egg Accounts</h3>
           </div>
           <div className="shell-actions">
-            <Link to="/leaderboards" className="btn btn-xs btn-outline">
-              Leaderboards
-            </Link>
+            {!featureFlags.leaderboards ? null : (
+              <Link to="/leaderboards" className="btn btn-xs btn-outline">
+                Leaderboards
+              </Link>
+            )}
             <Link to="/settings" className="btn btn-xs btn-outline">
               Settings
             </Link>

@@ -2,11 +2,16 @@ import { Navigate, useLocation } from 'react-router-dom'
 import type { ReactElement } from 'react'
 import { useAuthToken } from '../hooks/useAuthToken'
 import { getRoleFromJwt } from '../utils/jwt'
+import { featureFlags } from '../utils/featureFlags'
 
 const AdminProtectedRoute = ({ children }: { children: ReactElement }) => {
   const token = useAuthToken()
   const location = useLocation()
   const role = getRoleFromJwt(token)
+
+  if (!featureFlags.admin) {
+    return <Navigate to="/" replace />
+  }
 
   if (role !== 'Admin') {
     return <Navigate to="/login" replace state={{ from: location }} />

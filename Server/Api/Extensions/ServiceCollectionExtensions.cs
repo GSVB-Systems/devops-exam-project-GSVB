@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using Sieve.Services;
+using DevOpsAppApi;
 
 namespace DevOpsAppApi.Extensions;
 
@@ -85,6 +86,7 @@ public static class ServiceCollectionExtensions
 
         services.AddControllers();
         services.AddOpenApiDocument();
+        services.Configure<FeatureFlagsOptions>(configuration.GetSection(FeatureFlagsOptions.SectionName));
         services.AddScoped<IUserEggSnapshotRepository, UserEggSnapshotRepository>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEggAccountService, EggAccountService>();
