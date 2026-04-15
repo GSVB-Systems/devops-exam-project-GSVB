@@ -4,10 +4,12 @@ on:
     branches:
       - main
       - Dev
+      - Dev2
   pull_request:
     branches:
       - main
       - Dev    # change to main if needed
+      - Dev2
 jobs:
   deploy:
     name: Deploy app
@@ -25,7 +27,7 @@ jobs:
       - name: Run local k6 test
         uses: grafana/run-k6-action@v1
         with:
-          path: ./Server/Api/k6Testing.js
+          path: ./Server/Api/K6Testing.js
         env:
           K6LOGINTEST_EMAIL: ${{ secrets.K6LOGINTEST_EMAIL }}
           K6LOGINTEST_PASSWORD: ${{ secrets.K6LOGINTEST_PASSWORD }}

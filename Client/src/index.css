@@ -1,0 +1,128 @@
+:root,
+html[data-theme="default"] {
+  font-family: "Space Grotesk", "Trebuchet MS", "Segoe UI", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  --app-bg: #2f3033;
+  --app-text: #f1ede6;
+
+  --shell-bg: #3b3b3d;
+  --shell-panel: #454647;
+  --shell-border: #5a5b5e;
+  --shell-text: #f1ede6;
+  --shell-muted: #bfb9ad;
+  --shell-accent: #f5d072;
+  --shell-accent-2: #7dd9c5;
+
+  --shell-bg-highlight-1: #4a4b4e;
+  --shell-bg-highlight-2: #3a3b3d;
+  --shell-bg-grad-1: #343538;
+  --shell-bg-grad-2: #2f3033;
+  --shell-bg-grad-3: #2a2b2e;
+
+  --panel-grad-start: rgba(77, 78, 80, 0.9);
+  --panel-grad-end: rgba(60, 61, 63, 0.95);
+  --panel-shadow: rgba(0, 0, 0, 0.25);
+
+  --surface-soft: rgba(255, 255, 255, 0.08);
+  --surface-soft-hover: rgba(255, 255, 255, 0.12);
+  --surface-deep: rgba(20, 20, 20, 0.35);
+
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --shell-outline: rgba(255, 255, 255, 0.3);
+
+  --accent-ring: rgba(245, 208, 114, 0.6);
+  --focus-ring: rgba(245, 208, 114, 0.15);
+
+  --btn-primary-grad-start: #f5d072;
+  --btn-primary-grad-end: #e7b94f;
+  --btn-primary-grad-start-hover: #f6d985;
+  --btn-primary-grad-end-hover: #f0c056;
+  --btn-primary-text: #2b2b2b;
+
+  --status-error: #f28b82;
+  --status-success: #7dd9c5;
+
+  color: var(--app-text);
+  background-color: var(--app-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html[data-theme="alternate"] {
+  color-scheme: light;
+  --app-bg: #e9eef7;
+  --app-text: #1f2430;
+
+  --shell-bg: #f0f4fb;
+  --shell-panel: #ffffff;
+  --shell-border: #ccd6e8;
+  --shell-text: #1f2430;
+  --shell-muted: #5f6b80;
+  --shell-accent: #4c6fff;
+  --shell-accent-2: #1da89a;
+
+  --shell-bg-highlight-1: #ffffff;
+  --shell-bg-highlight-2: #dce5f6;
+  --shell-bg-grad-1: #eff3fb;
+  --shell-bg-grad-2: #e8edf7;
+  --shell-bg-grad-3: #dfe7f6;
+
+  --panel-grad-start: rgba(255, 255, 255, 0.96);
+  --panel-grad-end: rgba(244, 247, 255, 0.96);
+  --panel-shadow: rgba(31, 36, 48, 0.12);
+
+  --surface-soft: rgba(76, 111, 255, 0.09);
+  --surface-soft-hover: rgba(76, 111, 255, 0.14);
+  --surface-deep: rgba(76, 111, 255, 0.08);
+
+  --border-soft: rgba(56, 77, 115, 0.14);
+  --border-strong: rgba(56, 77, 115, 0.22);
+  --shell-outline: rgba(56, 77, 115, 0.28);
+
+  --accent-ring: rgba(76, 111, 255, 0.55);
+  --focus-ring: rgba(76, 111, 255, 0.2);
+
+  --btn-primary-grad-start: #5d7eff;
+  --btn-primary-grad-end: #4768ec;
+  --btn-primary-grad-start-hover: #6a8aff;
+  --btn-primary-grad-end-hover: #4f71f4;
+  --btn-primary-text: #ffffff;
+
+  --status-error: #c73d44;
+  --status-success: #158f83;
+}
+
+a {
+  font-weight: 500;
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  color: inherit;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--app-bg);
+}
+
+html {
+  background-color: var(--app-bg);
+}
+

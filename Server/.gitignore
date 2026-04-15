@@ -1,0 +1,41 @@
+﻿# Build artifacts
+**/bin/
+**/obj/
+
+# Rider / IntelliJ
+.idea/
+*.sln.iml
+
+# User- and machine-specific files
+*.user
+*.rsuser
+*.suo
+*.cache
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Test and coverage output (XPlat Code Coverage + ReportGenerator)
+**/TestResults/
+TestResults/
+**/*.trx
+**/coverage.cobertura.xml
+**/coverage.opencover.xml
+**/coverage.json
+
+# ReportGenerator output
+coverage-report/
+**/coverage-report/
+
+# Generic coverage folders/files
+coverage/
+**/coverage/
+lcov.info
+*.coverage
+*.coveragexml
+
+# Generated OpenAPI / client artifacts (local tooling outputs)
+Api/openapi-with-docs.json
+
