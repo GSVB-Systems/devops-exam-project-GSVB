@@ -27,55 +27,46 @@ Database storing user data pseudonymously
 ### Week 6
 **Feature 1:** Basic Login System
 
-**Feature 2:** EggApi Data Fetch
+**Feature 2:** EggApi Data Fetch raw
 
 ### Week 7
 *Winter vacation - nothing planned.*
 
 ### Week 8
-**Feature 1:** Account Linking with Alt Account Support
+**Feature 1:** Account Linking
 
 **Feature 2:** Stats Display
 
 ### Week 9
-**Feature 1:** Leaderboards Page
+**Feature 1:** Leaderboard page part 1
 
-**Feature 2:** Account Level Calculation
+**Feature 2:** Account Level Calculation*
 
 ### Week 10
-**Feature 1:** [...]
+**Feature 1:** Create User
 
-**Feature 2:** [...]
+**Feature 2:** Update User
 
 ### Week 11
-**Feature 1:** [...]
+**Feature 1:** Delete User
 
-**Feature 2:** [...]
+**Feature 2:** Leaderboard page part 2
 
 ### Week 12
-**Feature 1:** [...]
+**Feature 1:** EggApi Data Fetch final
 
-**Feature 2:** [...]
+**Feature 2:** Themes*
 
 ### Week 13
-**Feature 1:** [...]
+**Feature 1:** Leaderboard page part 3
 
-**Feature 2:** [...]
+**Feature 2:** Account linking with Alt Account Support
 
 ### Week 14
 *Easter vacation - nothing planned.*
 
 ### Week 15
-**Feature 1:** [...]
+**Feature 1:** Toggle feature*
 
-**Feature 2:** [...]
+**Feature 2:** Toggle feature*
 
-### Week 16
-**Feature 1:** [...]
-
-**Feature 2:** [...]
-
-### Week 17
-**Feature 1:** [...]
-
-**Feature 2:** [...]
