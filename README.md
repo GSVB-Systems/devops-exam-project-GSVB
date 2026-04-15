@@ -4,7 +4,7 @@ Leaderboard and data management application for Egg, Inc. With complementing ope
 
 ## Tech-stack
 
-Typescript + React2
+Typescript + React
 C Sharp
 [...]
 
