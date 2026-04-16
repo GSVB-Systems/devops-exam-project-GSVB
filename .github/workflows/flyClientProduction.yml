@@ -1,7 +1,7 @@
 name: Fly DeployClientProduction
 on:
   workflow_run:
-    workflows: ["Fly DeployClientStaging"]
+    workflows: ["Fly DeployClientStaging", "DevOps Pipeline"]
     types:
     - completed
 jobs:
