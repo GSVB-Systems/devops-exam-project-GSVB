@@ -70,3 +70,40 @@ Database storing user data pseudonymously
 
 **Feature 2:** Toggle feature*
 
+## Feature Flags
+
+The application uses feature flags to enable or disable specific functionality at runtime. Configuration is located in `appsettings.json` under the `FeatureFlags` section.
+
+| Flag | Default | Description |
+| --- | --- | --- |
+| `Leaderboards` | `true` | Enables or disables leaderboard functionality. |
+| `Admin` | `true` | Enables or disables administrative API endpoints (e.g., user management). |
+
+## DevOps & Automation
+
+This project utilizes a modern DevOps stack to ensure code quality and automated delivery.
+
+### CI/CD Pipeline
+- **DevOps Pipeline**: Automatically triggered on pushes to `main`, `Dev`, `Dev2`, `StrykerTest`, and `FlyTestStaging`.
+  - **Build & Test**: Compiles the solution and runs unit tests.
+  - **Code Coverage**: Generates reports for test coverage.
+  - **Mutation Testing**: Employs [Stryker.NET](https://stryker-mutator.io/) to evaluate test suite effectiveness by injecting faults (mutants) into the code. Reports are available as build artifacts.
+
+### Deployment (Fly.io)
+We use [Fly.io](https://fly.io/) for hosting with a multi-environment strategy:
+
+- **Staging Environment**:
+  - Automatically deployed on pushes to development branches.
+  - Client: [devopsclient.fly.dev](https://devopsclient.fly.dev)
+  - Server: [server-spring-cloud-8981.fly.dev](https://server-spring-cloud-8981.fly.dev)
+- **Production Environment**:
+  - Deployed from the `FlyTestStaging` branch after successful staging verification.
+  - Client: [eggincproductionclient.fly.dev](https://eggincproductionclient.fly.dev)
+  - Server: [eggincproductionserver.fly.dev](https://eggincproductionserver.fly.dev)
+
+### Agentic Workflows
+The repository includes automated AI-driven workflows located in `.github/workflows/`:
+- **Code Simplifier**: Analyzes daily changes and proposes refinements for better readability and maintainability.
+- **Daily Documentation Updater**: Ensures this documentation reflects the latest code changes.
+- **Daily Repo Status**: Provides daily summaries of repository activity and project progress.
+
