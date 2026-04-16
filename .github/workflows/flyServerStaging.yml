@@ -1,4 +1,4 @@
-name: Fly DeployServer
+name: Fly DeployServerStaging
 on:
   push:
     branches:
