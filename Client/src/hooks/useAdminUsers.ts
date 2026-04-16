@@ -11,11 +11,9 @@ const sanitizeSearchTerm = (value: string): string | null => {
     return normalized || null;
 }
 
-
 export type SortField = "username" | "email";
 export type RoleFilter = "All" | "Admin" | "User";
 export type SortDirection = "asc" | "desc";
-
 
 type useUsersResult = {
     users: UserDto[];
@@ -43,12 +41,8 @@ type useUsersResult = {
 };
 
 const coerceNumber = (value: unknown, fallback = 0): number => {
-    if (typeof value === "number" && !Number.isNaN(value)) return value;
-    if (typeof value === "string") {
-        const parsed = Number(value);
-        if (!Number.isNaN(parsed)) return parsed;
-    }
-    return fallback;
+    const num = Number(value);
+    return !Number.isNaN(num) ? num : fallback;
 }
 
 const buildSieveFilters = (search: string, role: RoleFilter): string => {
@@ -60,32 +54,6 @@ const buildSieveFilters = (search: string, role: RoleFilter): string => {
         filters.push(`role==${role}`);
     }
     return filters.join(",");
-}
-
-const filterList = (items: UserDto[], search: string, role: RoleFilter): UserDto[] => {
-    const term = search.trim().toLowerCase();
-    return items.filter((user) => {
-        const matchesRole = role === "All" ? true : (user.role ?? "").toLowerCase() === role.toLowerCase();
-        const matchesSearch = !term
-            ? true
-            : (user.username ?? "").toLowerCase().includes(term) || (user.email ?? "").toLowerCase().includes(term);
-        return matchesRole && matchesSearch;
-    });
-}
-
-const sortList = (items: UserDto[], field: SortField, direction: SortDirection): UserDto[] => {
-    const toValue = (user: UserDto): string => {
-        if (field === "username") return (user.username ?? "").toLowerCase();
-        if (field === "email") return (user.email ?? "").toLowerCase();
-        return "";
-    };
-    return [...items].sort((a, b) => {
-        const av = toValue(a);
-        const bv = toValue(b);
-        if (av === bv) return 0;
-        const comparison = av > bv ? 1 : -1;
-        return direction === "asc" ? comparison : -comparison;
-    });
 }
 
 export function useAdminUsers(): useUsersResult {
@@ -106,11 +74,11 @@ export function useAdminUsers(): useUsersResult {
 
     const filters = useMemo(() => {
         const term = sanitizeSearchTerm(searchTerm) ?? "";
-        const built = buildSieveFilters(term, roleFilter);
-        return built || undefined;
+        return buildSieveFilters(term, roleFilter) || undefined;
     }, [roleFilter, searchTerm]);
+
     const sorts = useMemo(() => (sortDirection === "asc" ? sortField : `-${sortField}`), [sortDirection, sortField]);
-    const totalPages = useMemo(() => Math.max(1, Math.ceil(total / pageSize) || 1), [pageSize, total]);
+    const totalPages = useMemo(() => Math.max(1, Math.ceil(total / pageSize)), [pageSize, total]);
 
     const fetchUsers = useCallback(async (): Promise<void> => {
         setLoading(true);
@@ -122,16 +90,12 @@ export function useAdminUsers(): useUsersResult {
             const totalCount = coerceNumber(response?.totalCount, list.length);
             const serverPageSize = coerceNumber(response?.pageSize, DEFAULT_PAGE_SIZE);
             const serverPage = Math.max(1, coerceNumber(response?.page, page));
-            const serverTotalPages = Math.max(1, Math.ceil(totalCount / serverPageSize) || 1);
-
-            const filteredList = filterList(list, searchTerm, roleFilter);
-            const sortedList = sortList(filteredList, sortField, sortDirection);
-
-            setUsers(sortedList);
+            
+            setUsers(list);
             setTotal(totalCount);
             setPageSize(serverPageSize);
-            setPage(Math.min(serverPage, serverTotalPages));
-        } catch (error) {
+            setPage(serverPage);
+        } catch {
             setError("Failed to load users.");
             setUsers([]);
             setTotal(0);
@@ -139,7 +103,6 @@ export function useAdminUsers(): useUsersResult {
             setLoading(false);
             setHasLoadedOnce(true);
         }
-
     }, [filters, page, pageSize, sorts]);
 
     useEffect(() => {

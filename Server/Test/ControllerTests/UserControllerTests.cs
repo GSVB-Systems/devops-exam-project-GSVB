@@ -11,29 +11,29 @@ namespace Test.ControllerTests;
 
 public class UserControllerTests
 {
-    private static IOptions<FeatureFlagsOptions> EnabledFlags()
+    private static IOptions<FeatureFlagsOptions> EnabledFlags() => GetFlags(admin: true);
+    private static IOptions<FeatureFlagsOptions> DisabledAdminFlags() => GetFlags(admin: false);
+
+    private static IOptions<FeatureFlagsOptions> GetFlags(bool admin = true, bool leaderboards = true)
     {
         return Options.Create(new FeatureFlagsOptions
         {
-            Admin = true,
-            Leaderboards = true
+            Admin = admin,
+            Leaderboards = leaderboards
         });
     }
 
-    private static IOptions<FeatureFlagsOptions> DisabledAdminFlags()
+    private (UserController Controller, Mock<IUserService> Service) CreateController(IOptions<FeatureFlagsOptions>? flags = null)
     {
-        return Options.Create(new FeatureFlagsOptions
-        {
-            Admin = false,
-            Leaderboards = true
-        });
+        var service = new Mock<IUserService>();
+        var controller = new UserController(service.Object, flags ?? EnabledFlags());
+        return (controller, service);
     }
 
     [Fact]
     public async Task GetMe_ReturnsUnauthorized_WhenUserClaimMissing()
     {
-        var service = new Mock<IUserService>();
-        var controller = new UserController(service.Object, EnabledFlags());
+        var (controller, _) = CreateController();
         ControllerTestHelpers.SetUser(controller);
 
         var result = await controller.GetMe();
@@ -44,10 +44,8 @@ public class UserControllerTests
     [Fact]
     public async Task GetMe_ReturnsNotFound_WhenServiceReturnsNull()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         service.Setup(x => x.GetByIdAsync("u-1")).ReturnsAsync((UserDto?)null);
-
-        var controller = new UserController(service.Object, EnabledFlags());
         ControllerTestHelpers.SetUser(controller, "u-1");
 
         var result = await controller.GetMe();
@@ -58,12 +56,10 @@ public class UserControllerTests
     [Fact]
     public async Task GetMe_ReturnsOk_WhenUserExists()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         var expected = ControllerTestData.UserDto();
         expected.UserId = "u-1";
         service.Setup(x => x.GetByIdAsync("u-1")).ReturnsAsync(expected);
-
-        var controller = new UserController(service.Object, EnabledFlags());
         ControllerTestHelpers.SetUser(controller, "u-1");
 
         var result = await controller.GetMe();
@@ -75,8 +71,7 @@ public class UserControllerTests
     [Fact]
     public async Task GetAll_ReturnsNotFound_WhenAdminFlagDisabled()
     {
-        var service = new Mock<IUserService>();
-        var controller = new UserController(service.Object, DisabledAdminFlags());
+        var (controller, _) = CreateController(DisabledAdminFlags());
 
         var result = await controller.GetAll(parameters: null);
 
@@ -86,8 +81,7 @@ public class UserControllerTests
     [Fact]
     public async Task GetById_ReturnsNotFound_WhenAdminFlagDisabled()
     {
-        var service = new Mock<IUserService>();
-        var controller = new UserController(service.Object, DisabledAdminFlags());
+        var (controller, _) = CreateController(DisabledAdminFlags());
 
         var result = await controller.GetById("u-1");
 
@@ -97,9 +91,8 @@ public class UserControllerTests
     [Fact]
     public async Task GetById_ReturnsNotFound_WhenUserMissing()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         service.Setup(x => x.GetByIdAsync("u-1")).ReturnsAsync((UserDto?)null);
-        var controller = new UserController(service.Object, EnabledFlags());
 
         var result = await controller.GetById("u-1");
 
@@ -109,12 +102,8 @@ public class UserControllerTests
     [Fact]
     public async Task Update_ReturnsNotFound_WhenAdminFlagDisabled()
     {
-        var service = new Mock<IUserService>();
-        var controller = new UserController(service.Object, DisabledAdminFlags());
-        var dto = new UpdateUserDto
-        {
-            Username = "updated-user"
-        };
+        var (controller, _) = CreateController(DisabledAdminFlags());
+        var dto = new UpdateUserDto { Username = "updated-user" };
 
         var result = await controller.Update("u-1", dto);
 
@@ -124,7 +113,7 @@ public class UserControllerTests
     [Fact]
     public async Task Update_ReturnsOk_WhenUserUpdated()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         var dto = new UpdateUserDto
         {
             Username = "updated-user",
@@ -132,7 +121,6 @@ public class UserControllerTests
         };
         var expected = ControllerTestData.UserDto(seed: 109);
         service.Setup(x => x.UpdateAsync("u-1", dto)).ReturnsAsync(expected);
-        var controller = new UserController(service.Object, EnabledFlags());
 
         var result = await controller.Update("u-1", dto);
 
@@ -143,8 +131,7 @@ public class UserControllerTests
     [Fact]
     public async Task Delete_ReturnsNotFound_WhenAdminFlagDisabled()
     {
-        var service = new Mock<IUserService>();
-        var controller = new UserController(service.Object, DisabledAdminFlags());
+        var (controller, _) = CreateController(DisabledAdminFlags());
 
         var result = await controller.Delete("u-1");
 
@@ -154,9 +141,8 @@ public class UserControllerTests
     [Fact]
     public async Task Delete_ReturnsNoContent_WhenDeleted()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         service.Setup(x => x.DeleteAsync("u-1")).ReturnsAsync(true);
-        var controller = new UserController(service.Object, EnabledFlags());
 
         var result = await controller.Delete("u-1");
 
@@ -166,9 +152,8 @@ public class UserControllerTests
     [Fact]
     public async Task Delete_ReturnsNotFound_WhenNotDeleted()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         service.Setup(x => x.DeleteAsync("u-1")).ReturnsAsync(false);
-        var controller = new UserController(service.Object, EnabledFlags());
 
         var result = await controller.Delete("u-1");
 
@@ -178,10 +163,9 @@ public class UserControllerTests
     [Fact]
     public async Task Login_ReturnsUnauthorized_WhenCredentialsInvalid()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         var request = ControllerTestData.LoginRequest();
         service.Setup(x => x.LoginAsync(request)).ReturnsAsync((AuthResponseDto?)null);
-        var controller = new UserController(service.Object, EnabledFlags());
 
         var result = await controller.Login(request);
 
@@ -191,16 +175,14 @@ public class UserControllerTests
     [Fact]
     public async Task Login_ReturnsOk_WhenCredentialsValid()
     {
-        var service = new Mock<IUserService>();
+        var (controller, service) = CreateController();
         var expected = ControllerTestData.AuthResponse();
         var request = ControllerTestData.LoginRequest(seed: 107);
         service.Setup(x => x.LoginAsync(request)).ReturnsAsync(expected);
-        var controller = new UserController(service.Object, EnabledFlags());
 
         var result = await controller.Login(request);
 
         var ok = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Same(expected, ok.Value);
     }
-
 }
