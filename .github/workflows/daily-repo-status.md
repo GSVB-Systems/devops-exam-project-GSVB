@@ -31,6 +31,8 @@ safe-outputs:
     title-prefix: "[repo-status] "
     labels: [report, daily-status]
     close-older-issues: true
+engine: gemini
+
 source: githubnext/agentics/workflows/daily-repo-status.md@11c9a2c442e519ff2b427bf58679f5a525353f76
 ---
 
