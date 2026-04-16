@@ -7,6 +7,7 @@ app = 'eggincproductionclient'
 primary_region = 'arn'
 
 [build]
+  dockerfile = "Dockerfile"
 
 [http_service]
   internal_port = 8080
@@ -20,3 +21,6 @@ primary_region = 'arn'
   memory = '1gb'
   cpus = 1
   memory_mb = 1024
+  
+  [[env]]
+    BACKEND_URL = "https://eggincproductionserver.fly.dev"
