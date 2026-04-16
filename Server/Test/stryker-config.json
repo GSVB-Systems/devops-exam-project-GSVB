@@ -12,9 +12,16 @@
       "break": 0
     },
     "mutate": [
+      "../Service/Services/**/*.cs",
+      "../Service/Auth/**/*.cs",
+      "../Service/EggApi/**/*.cs",
+      "../Repository/Repos/**/*.cs",
+      "!**/*Dto.cs",
+      "!**/*Options.cs",
       "!**/Migrations/*.cs",
       "!**/Program.cs",
-      "!**/GenerateTypeScript.cs"
+      "!**/GenerateTypeScript.cs",
+      "!**/Class1.cs"
     ]
   }
 }
