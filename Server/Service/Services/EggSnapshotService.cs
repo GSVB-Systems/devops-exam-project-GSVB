@@ -55,7 +55,15 @@ public class EggSnapshotService : IEggSnapshotService
                 null);
             var mer = recalculated.Mer ?? existing.Mer;
             var jer = recalculated.Jer ?? existing.Jer;
-            if (mer != existing.Mer || jer != existing.Jer)
+            const double epsilon = 1e-9;
+
+            var merChanged = mer.HasValue != existing.Mer.HasValue
+                || (mer.HasValue && existing.Mer.HasValue && Math.Abs(mer.Value - existing.Mer.Value) > epsilon);
+
+            var jerChanged = jer.HasValue != existing.Jer.HasValue
+                || (jer.HasValue && existing.Jer.HasValue && Math.Abs(jer.Value - existing.Jer.Value) > epsilon);
+
+            if (merChanged || jerChanged)
             {
                 existing.Mer = mer;
                 existing.Jer = jer;
