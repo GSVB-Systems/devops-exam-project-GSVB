@@ -5,6 +5,7 @@ on:
       - main
       - Dev
       - Dev2
+      - FlyTestStaging
   pull_request:
     branches:
       - main
