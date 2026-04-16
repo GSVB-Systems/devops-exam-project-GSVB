@@ -1,6 +1,7 @@
 {
   "stryker-config": {
     "project": "DevOpsAppApi.csproj",
+    "coverage-analysis": "off",
     "reporters": [
       "html",
       "json",
@@ -12,16 +13,11 @@
       "break": 0
     },
     "mutate": [
-      "../Service/Services/**/*.cs",
-      "../Service/Auth/**/*.cs",
-      "../Service/EggApi/**/*.cs",
-      "../Repository/Repos/**/*.cs",
-      "!**/*Dto.cs",
-      "!**/*Options.cs",
-      "!**/Migrations/*.cs",
+      "**/Controllers/**/*.cs",
+      "**/Extensions/**/*.cs",
       "!**/Program.cs",
       "!**/GenerateTypeScript.cs",
-      "!**/Class1.cs"
+      "!**/FeatureFlagsOptions.cs"
     ]
   }
 }
