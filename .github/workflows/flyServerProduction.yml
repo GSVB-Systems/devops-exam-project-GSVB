@@ -1,10 +1,8 @@
 name: Fly DeployServerProduction
 on:
   workflow_run:
-    workflows:
-      - Fly DeployServerStaging
-    types:
-      - completed
+    workflows: ["Fly DeployServerStaging"]
+    types: [completed]
       
 jobs:
   deploy:
