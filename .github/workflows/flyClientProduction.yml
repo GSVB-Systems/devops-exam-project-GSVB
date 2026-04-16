@@ -1,13 +1,9 @@
 name: Fly DeployClientProduction
 on:
-  push:
-    branches:
-      - main
-      - FlyTestStaging
-  pull_request:
-    branches:
-      - main
-      - FlyTestStaging
+  workflow_run:
+    workflows: ["Fly DeployClientStaging"]
+    types:
+      - completed
 jobs:
   deploy:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
