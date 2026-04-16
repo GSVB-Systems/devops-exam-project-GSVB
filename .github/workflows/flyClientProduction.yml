@@ -2,6 +2,7 @@ name: Fly DeployClientProduction
 on:
   workflow_run:
     workflows: ["Fly DeployClientStaging"]
+    branches: [main, FlyTestStaging]
     types: [completed]
 jobs:
   deploy:
