@@ -29,6 +29,10 @@ TestResults/
 coverage-report/
 **/coverage-report/
 
+# Stryker.NET mutation testing output
+StrykerOutput/
+**/StrykerOutput/
+
 # Generic coverage folders/files
 coverage/
 **/coverage/

@@ -41,6 +41,9 @@ Server/Repository/DevOpsAppRepo/.env
 **/appsettings.*.json
 # (keep appsettings.json tracked)
 
+# Stryker.NET mutation testing output
+**/StrykerOutput/
+
 # Created by https://www.toptal.com/developers/gitignore/api/rider,csharp,webstorm
 # Edit at https://www.toptal.com/developers/gitignore?templates=rider,csharp,webstorm
 
