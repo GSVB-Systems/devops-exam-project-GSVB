@@ -20,6 +20,15 @@ public class UserControllerTests
         });
     }
 
+    private static IOptions<FeatureFlagsOptions> DisabledAdminFlags()
+    {
+        return Options.Create(new FeatureFlagsOptions
+        {
+            Admin = false,
+            Leaderboards = true
+        });
+    }
+
     [Fact]
     public async Task GetMe_ReturnsUnauthorized_WhenUserClaimMissing()
     {
@@ -61,6 +70,85 @@ public class UserControllerTests
 
         var ok = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Same(expected, ok.Value);
+    }
+
+    [Fact]
+    public async Task GetAll_ReturnsNotFound_WhenAdminFlagDisabled()
+    {
+        var service = new Mock<IUserService>();
+        var controller = new UserController(service.Object, DisabledAdminFlags());
+
+        var result = await controller.GetAll(parameters: null);
+
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task GetById_ReturnsNotFound_WhenAdminFlagDisabled()
+    {
+        var service = new Mock<IUserService>();
+        var controller = new UserController(service.Object, DisabledAdminFlags());
+
+        var result = await controller.GetById("u-1");
+
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task GetById_ReturnsNotFound_WhenUserMissing()
+    {
+        var service = new Mock<IUserService>();
+        service.Setup(x => x.GetByIdAsync("u-1")).ReturnsAsync((UserDto?)null);
+        var controller = new UserController(service.Object, EnabledFlags());
+
+        var result = await controller.GetById("u-1");
+
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task Update_ReturnsNotFound_WhenAdminFlagDisabled()
+    {
+        var service = new Mock<IUserService>();
+        var controller = new UserController(service.Object, DisabledAdminFlags());
+        var dto = new UpdateUserDto
+        {
+            Username = "updated-user"
+        };
+
+        var result = await controller.Update("u-1", dto);
+
+        Assert.IsType<NotFoundResult>(result.Result);
+    }
+
+    [Fact]
+    public async Task Update_ReturnsOk_WhenUserUpdated()
+    {
+        var service = new Mock<IUserService>();
+        var dto = new UpdateUserDto
+        {
+            Username = "updated-user",
+            Email = "updated@test.local"
+        };
+        var expected = ControllerTestData.UserDto(seed: 109);
+        service.Setup(x => x.UpdateAsync("u-1", dto)).ReturnsAsync(expected);
+        var controller = new UserController(service.Object, EnabledFlags());
+
+        var result = await controller.Update("u-1", dto);
+
+        var ok = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Same(expected, ok.Value);
+    }
+
+    [Fact]
+    public async Task Delete_ReturnsNotFound_WhenAdminFlagDisabled()
+    {
+        var service = new Mock<IUserService>();
+        var controller = new UserController(service.Object, DisabledAdminFlags());
+
+        var result = await controller.Delete("u-1");
+
+        Assert.IsType<NotFoundResult>(result);
     }
 
     [Fact]

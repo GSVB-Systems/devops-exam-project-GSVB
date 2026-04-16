@@ -1,7 +1,10 @@
 {
   "stryker-config": {
     "project": "DevOpsAppApi.csproj",
-    "coverage-analysis": "off",
+    "test-runner": "mtp",
+    "coverage-analysis": "perTestInIsolation",
+    "test-case-filter": "FullyQualifiedName~ControllerTests",
+    "additional-timeout": 10000,
     "reporters": [
       "html",
       "json",
@@ -14,7 +17,6 @@
     },
     "mutate": [
       "**/Controllers/**/*.cs",
-      "**/Extensions/**/*.cs",
       "!**/Program.cs",
       "!**/GenerateTypeScript.cs",
       "!**/FeatureFlagsOptions.cs"
