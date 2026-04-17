@@ -33,7 +33,7 @@ jobs:
         working-directory: Server
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING_STAGING }}
-        run: dotnet ef database update --project Repository/DevOpsAppRepo.csproj --startup-project Api/DevOpsAppApi.csproj
+        run: dotnet ef database update --project Repository/DevOpsAppRepo.csproj
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy -c ./fly.staging.toml --remote-only
         working-directory: Server/
