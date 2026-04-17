@@ -6,12 +6,14 @@ on:
       - Dev
       - Dev2
       - FlyTestStaging
+      - databaseUpdate
   pull_request:
     branches:
       - main
       - Dev    # change to main if needed
       - Dev2
       - FlyTestStaging
+      - databaseUpdate
 jobs:
   deploy:
     name: Deploy app
