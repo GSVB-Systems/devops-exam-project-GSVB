@@ -18,6 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Install dotnet-ef
+        run: dotnet tool install --global dotnet-ef
+      - name: Apply database migrations (staging)
+        working-directory: Server
+        env:
+          ConnectionStrings__DefaultConnection: ${{ secrets.DB_CONNECTION_STRING_STAGING }}
+        run: dotnet ef database update --project Repository/DevOpsAppRepo.csproj --startup-project Api/DevOpsAppApi.csproj
       - uses: superfly/flyctl-actions/setup-flyctl@master
       - run: flyctl deploy -c ./fly.staging.toml --remote-only
         working-directory: Server/
