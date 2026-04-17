@@ -6,12 +6,14 @@ on:
       - Dev
       - Dev2
       - FlyTestStaging
+      - databaseUpdate
   pull_request:
     branches:
       - main
       - Dev    # change to main if needed
       - Dev2
       - FlyTestStaging
+      - databaseUpdate
 jobs:
   deploy:
     name: Deploy app
@@ -24,6 +26,9 @@ jobs:
           dotnet-version: 10.0.x
       - name: Install dotnet-ef
         run: dotnet tool install --global dotnet-ef
+      - name: Restore NuGet packages
+        working-directory: Server
+        run: dotnet restore
       - name: Apply database migrations (staging)
         working-directory: Server
         env:

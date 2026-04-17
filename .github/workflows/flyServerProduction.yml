@@ -19,6 +19,9 @@ jobs:
           dotnet-version: 10.0.x
       - name: Install dotnet-ef
         run: dotnet tool install --global dotnet-ef
+      - name: Restore NuGet packages
+        working-directory: Server
+        run: dotnet restore
       - name: Apply database migrations (production)
         working-directory: Server
         env:

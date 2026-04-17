@@ -1,9 +1,9 @@
 ﻿name: DevOps Pipeline
 on:
   push:
-    branches: [ main, Dev, Dev2, StrykerTest, FlyTestStaging ]
+    branches: [ main, Dev, Dev2, StrykerTest, FlyTestStaging, databaseUpdate ]
   pull_request:
-    branches: [ main, Dev, Dev2, StrykerTest, FlyTestStaging ]
+    branches: [ main, Dev, Dev2, StrykerTest, FlyTestStaging, databaseUpdate ]
 
 jobs:
   build:
